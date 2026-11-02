@@ -105,7 +105,7 @@
    ===================================================================== */
 (function(){
   'use strict';
-  var PAINEL = 'https://shbhclxhlffdusikjeqp.supabase.co', CHAVE = 'sb_publishable_0u_j3zKFnJDkhN57KRJ9Ng_7uN24jl4', FLAG = 'rvAcessoSuspenso_v1';
+  var PAINEL = 'https://ufoivqszbpznwwkpbvil.supabase.co', CHAVE = 'sb_publishable_u9l2Jz3-aMrnU1JKrQwEUw_46OKJ2m9', FLAG = 'rvAcessoSuspenso_v1';
   var R = window.RESTAURANTE || {}, FETCH = window.fetch.bind(window);
   if(!R.supabaseUrl && !R.slug) return;
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
@@ -317,7 +317,7 @@
    ===================================================================== */
 (function(){
   'use strict';
-  var PAINEL = 'https://shbhclxhlffdusikjeqp.supabase.co', CHAVE = 'sb_publishable_0u_j3zKFnJDkhN57KRJ9Ng_7uN24jl4';
+  var PAINEL = 'https://ufoivqszbpznwwkpbvil.supabase.co', CHAVE = 'sb_publishable_u9l2Jz3-aMrnU1JKrQwEUw_46OKJ2m9';
   var R = window.RESTAURANTE || {}, FETCH = window.fetch.bind(window), vistos = {}, total = 0;
   if(!R.slug) return;
   var RUIDO = /ResizeObserver|Script error\.?$|Failed to fetch|NetworkError|Load failed|AbortError|Acesso suspenso|The operation was aborted|chrome-extension|moz-extension|Non-Error promise rejection|network request failed/i;

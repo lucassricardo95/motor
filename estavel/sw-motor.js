@@ -15,7 +15,7 @@ const FOTOS = 'fotos-v1';
    A lista abaixo é gerada pelo script de selagem (selar.py) a cada entrega. */
 const CODIGO = 'codigo-v1';   // trocou o nome = todo aparelho descarta o cache de código antigo (inclusive cópia vazia)
 const LISTA = [/*LISTA-INICIO*/
-  'js/app-00-marca.js?v=b22a1d7d',
+  'js/app-00-marca.js?v=b329e4c2',
   'css/estilo-base.css?v=9af376ca',
   'js/app-01-base-e-api.js?v=365a9da4',
   'js/app-02-abas.js?v=ab56e346',
