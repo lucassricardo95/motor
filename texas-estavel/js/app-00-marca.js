@@ -201,6 +201,99 @@
       }, 1000);
     }catch(e){}
   }
+  /* TERMOS DE USO — depois que o fornecedor marca o restaurante como entregue, o Admin lê, aceita, manda a foto do rosto e assina.
+     Só o Admin vê (a equipe e o cardápio não são afetados). O aceite fica guardado com o fornecedor. */
+  var termosPedidos = false;
+  function pedirTermos(){
+    if(termosPedidos) return; termosPedidos = true;
+    var T = null, ov = null, enviado = false, fotoURL = '', sig = { tracos:0, comprimento:0 };
+    function elx(id){ return document.getElementById(id); }
+    function usuario(){ try{ return (typeof currentUser !== 'undefined') ? currentUser : null; }catch(e){ return null; } }
+    function html(txt){ return String(txt).split('\n').map(function(l){ return /^## /.test(l) ? '<h4 style="margin:16px 0 6px;color:#fff">' + esc(l.slice(3)) + '</h4>' : (l.trim() ? '<p style="margin:0 0 8px">' + esc(l) + '</p>' : ''); }).join(''); }
+    function carregarTexto(cb){
+      FETCH(PAINEL + '/rest/v1/rpc/termos_texto', { method:'POST', headers:{ apikey:CHAVE, 'Content-Type':'application/json' }, body: JSON.stringify({ p_slug: R.slug || '', p_url: R.supabaseUrl || '' }) })
+        .then(function(r){ return r.ok ? r.json() : null; }).then(function(j){ if(j && j.ok) { T = j; cb(); } else termosPedidos = false; }).catch(function(){ termosPedidos = false; });
+    }
+    function montar(){
+      ov = document.createElement('div'); ov.id = 'rvTermos';
+      ov.style.cssText = 'position:fixed;inset:0;z-index:2147483200;background:#0a0a0a;color:#e9e1e1;overflow:auto;-webkit-overflow-scrolling:touch;font:15px/1.5 system-ui,sans-serif';
+      var inp = 'width:100%;box-sizing:border-box;margin:4px 0 10px;padding:11px;border-radius:10px;border:1px solid #444;background:#151515;color:#fff;font:inherit';
+      ov.innerHTML = '<div style="max-width:640px;margin:0 auto;padding:18px 16px 40px">'
+        + '<h2 style="margin:0 0 4px">📄 Termos de uso do sistema</h2><p style="margin:0 0 12px;color:#bdb2b2">Para continuar no painel administrativo, leia os termos, confirme seus dados, tire uma foto do rosto e assine. A equipe e o cardápio continuam funcionando normalmente.</p>'
+        + '<div id="tmTexto" style="height:42vh;overflow:auto;background:#151515;border:1px solid #3a3a3a;border-radius:12px;padding:12px;color:#d6cccc;font-size:14px">' + html(T.texto) + '</div>'
+        + '<div id="tmDica" style="color:#f0a500;font-size:13px;margin:6px 0 10px">Role o texto até o final para liberar o aceite.</div>'
+        + '<div id="tmCaixas" style="opacity:.45;pointer-events:none">'
+        + '<label style="display:flex;gap:10px;margin:8px 0"><input type="checkbox" id="tmLeu" style="width:22px;height:22px;flex:none"><span>Li e concordo com todos os termos acima.</span></label>'
+        + '<label style="display:flex;gap:10px;margin:8px 0"><input type="checkbox" id="tmDados" style="width:22px;height:22px;flex:none"><span>Autorizo o uso do meu nome, documento, foto do rosto, assinatura, IP e aparelho para comprovar este aceite (cláusula 6).</span></label>'
+        + '<label style="display:flex;gap:10px;margin:8px 0"><input type="checkbox" id="tmCustos" style="width:22px;height:22px;flex:none"><span>Estou ciente de que, se for necessário, haverá custo de planos pagos da infraestrutura, como o plano Pro do Supabase (cláusula 8).</span></label>'
+        + '<label style="display:flex;gap:10px;margin:8px 0"><input type="checkbox" id="tmPoderes" style="width:22px;height:22px;flex:none"><span>Sou o(a) responsável pelo estabelecimento ou tenho poderes para assinar por ele.</span></label>'
+        + '<h4 style="margin:16px 0 4px">Seus dados</h4>'
+        + '<label>Nome completo</label><input id="tmNome" autocomplete="name" maxlength="120" style="' + inp + '">'
+        + '<label>CPF ou CNPJ</label><input id="tmDoc" inputmode="numeric" maxlength="20" style="' + inp + '">'
+        + '<label>Cargo</label><input id="tmCargo" maxlength="80" placeholder="Ex.: Proprietário" style="' + inp + '">'
+        + '<label>E-mail</label><input id="tmEmail" type="email" maxlength="120" style="' + inp + '">'
+        + '<label>Telefone / WhatsApp</label><input id="tmTel" inputmode="tel" maxlength="40" style="' + inp + '">'
+        + '<h4 style="margin:16px 0 4px">Foto do rosto</h4><div id="tmFotoBox" style="text-align:center"><p style="margin:0 0 8px;color:#bdb2b2;font-size:13px">Rosto de frente, sem óculos escuros nem boné, em local claro.</p><button id="tmCam" style="font:inherit;padding:11px 20px;border:1px solid #d4262c;border-radius:12px;background:transparent;color:#fff;font-weight:700">📷 Tirar foto</button> <label style="display:inline-block;color:#bdb2b2;font-size:13px;margin-left:6px;text-decoration:underline">escolher da galeria<input id="tmArq" type="file" accept="image/*" capture="user" style="display:none"></label></div>'
+        + '<h4 style="margin:16px 0 4px">Assinatura <button id="tmLimpa" style="font:inherit;font-size:12px;margin-left:8px;padding:3px 10px;border:1px solid #555;border-radius:8px;background:transparent;color:#ccc">limpar</button></h4>'
+        + '<canvas id="tmSig" width="640" height="220" style="width:100%;height:150px;background:#fff;border-radius:12px;touch-action:none"></canvas>'
+        + '<div id="tmErro" style="color:#ff8a8a;min-height:22px;margin:10px 0 4px"></div>'
+        + '<button id="tmEnviar" style="font:inherit;width:100%;padding:14px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700">Aceitar e assinar</button></div></div>';
+      document.body.appendChild(ov);
+      var box = elx('tmTexto');
+      function fim(){ if(box.scrollTop + box.clientHeight >= box.scrollHeight - 8){ elx('tmCaixas').style.opacity = 1; elx('tmCaixas').style.pointerEvents = 'auto'; elx('tmDica').style.display = 'none'; } }
+      box.addEventListener('scroll', fim); fim();
+      // assinatura
+      var cv = elx('tmSig'), cx = cv.getContext('2d'), desenhando = false, ult = null;
+      cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); cx.strokeStyle = '#111'; cx.lineWidth = 3.2; cx.lineCap = 'round'; cx.lineJoin = 'round';
+      function pos(e){ var r = cv.getBoundingClientRect(); return { x:(e.clientX - r.left) * cv.width / r.width, y:(e.clientY - r.top) * cv.height / r.height }; }
+      cv.addEventListener('pointerdown', function(e){ e.preventDefault(); desenhando = true; ult = pos(e); sig.tracos++; try{ cv.setPointerCapture(e.pointerId); }catch(x){} });
+      cv.addEventListener('pointermove', function(e){ if(!desenhando) return; e.preventDefault(); var p = pos(e); cx.beginPath(); cx.moveTo(ult.x, ult.y); cx.lineTo(p.x, p.y); cx.stroke(); sig.comprimento += Math.abs(p.x - ult.x) + Math.abs(p.y - ult.y); ult = p; });
+      function solta(){ desenhando = false; } cv.addEventListener('pointerup', solta); cv.addEventListener('pointercancel', solta);
+      elx('tmLimpa').onclick = function(){ cx.fillStyle = '#fff'; cx.fillRect(0, 0, cv.width, cv.height); sig = { tracos:0, comprimento:0 }; };
+      // foto
+      function mostrarFoto(url){ fotoURL = url; elx('tmFotoBox').innerHTML = '<img src="' + url + '" style="width:170px;height:170px;object-fit:cover;border-radius:14px;border:2px solid #2f9e44"><div style="margin-top:8px"><button id="tmRefaz" style="font:inherit;padding:8px 16px;border:1px solid #555;border-radius:10px;background:transparent;color:#ddd">Tirar outra</button></div>'; elx('tmRefaz').onclick = function(){ fotoURL = ''; abrirCamera(); }; }
+      function reduzir(img){ var m = 480, e = Math.min(1, m / Math.max(img.width || img.videoWidth, img.height || img.videoHeight)), w = Math.round((img.width || img.videoWidth) * e), h = Math.round((img.height || img.videoHeight) * e), c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(img, 0, 0, w, h); return c.toDataURL('image/jpeg', 0.72); }
+      function abrirCamera(){
+        var b = elx('tmFotoBox');
+        if(!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)){ b.innerHTML = '<button id="tmCam2" style="font:inherit;padding:11px 20px;border:1px solid #d4262c;border-radius:12px;background:transparent;color:#fff;font-weight:700">📷 Tirar foto</button><input id="tmArq2" type="file" accept="image/*" capture="user" style="display:none">'; elx('tmCam2').onclick = function(){ elx('tmArq2').click(); }; elx('tmArq2').onchange = function(){ doArquivo(this.files[0]); }; return; }
+        navigator.mediaDevices.getUserMedia({ video:{ facingMode:'user' }, audio:false }).then(function(st){
+          b.innerHTML = '<video id="tmVid" playsinline autoplay muted style="width:100%;max-width:320px;border-radius:14px;background:#000;transform:scaleX(-1)"></video><div style="margin-top:8px"><button id="tmClick" style="font:inherit;padding:11px 24px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700">Capturar</button></div>';
+          var v = elx('tmVid'); v.srcObject = st;
+          elx('tmClick').onclick = function(){ if(!v.videoWidth) return; var u = reduzir(v); st.getTracks().forEach(function(t){ t.stop(); }); mostrarFoto(u); };
+        }).catch(function(){ elx('tmErro').textContent = 'Não consegui abrir a câmera. Libere a câmera no navegador ou escolha uma foto da galeria.'; b.innerHTML = '<label style="display:inline-block;padding:11px 20px;border:1px solid #d4262c;border-radius:12px;color:#fff;font-weight:700">📷 Escolher foto<input type="file" accept="image/*" capture="user" style="display:none" onchange="window.__tmArq(this.files[0])"></label>'; });
+      }
+      function doArquivo(f){ if(!f) return; var u = URL.createObjectURL(f), im = new Image(); im.onload = function(){ mostrarFoto(reduzir(im)); URL.revokeObjectURL(u); }; im.onerror = function(){ elx('tmErro').textContent = 'Não consegui ler essa imagem.'; }; im.src = u; }
+      window.__tmArq = doArquivo;
+      elx('tmCam').onclick = abrirCamera; elx('tmArq').onchange = function(){ doArquivo(this.files[0]); };
+      // enviar
+      elx('tmEnviar').onclick = function(){
+        var er = elx('tmErro'), btn = elx('tmEnviar'); er.textContent = '';
+        var nome = elx('tmNome').value.trim(), doc = elx('tmDoc').value.trim();
+        if(!(elx('tmLeu').checked && elx('tmDados').checked && elx('tmCustos').checked && elx('tmPoderes').checked)) return er.textContent = 'Marque todas as confirmações.';
+        if(nome.length < 5 || nome.indexOf(' ') < 0) return er.textContent = 'Informe o nome completo.';
+        var dg = doc.replace(/\D/g, ''); if(dg.length !== 11 && dg.length !== 14) return er.textContent = 'Informe um CPF (11 números) ou CNPJ (14 números).';
+        if(!fotoURL) return er.textContent = 'Tire a foto do rosto.';
+        if(sig.comprimento < 250) return er.textContent = 'Faça a sua assinatura no quadro branco.';
+        btn.disabled = true; btn.textContent = 'Enviando…';
+        FETCH(PAINEL + '/rest/v1/rpc/aceitar_termos', { method:'POST', headers:{ apikey:CHAVE, 'Content-Type':'application/json' }, body: JSON.stringify({ p: {
+          slug: R.slug || '', url: R.supabaseUrl || '', versao: T.versao, nome: nome, documento: doc, cargo: elx('tmCargo').value.trim(), email: elx('tmEmail').value.trim(), telefone: elx('tmTel').value.trim(),
+          foto: fotoURL, assinatura: cv.toDataURL('image/png'), aparelho: navigator.userAgent, marcas: { leu:true, dados:true, custos:true, poderes:true } } }) })
+          .then(function(r){ return r.ok ? r.json() : { ok:false, erro:'Não foi possível enviar agora. Tente de novo.' }; })
+          .then(function(j){ if(j && j.ok){ enviado = true; ov.innerHTML = '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px"><div><div style="font-size:54px">✅</div><h2>Termos aceitos</h2><p style="color:#bdb2b2">Obrigado! Seu aceite foi registrado.</p></div></div>'; setTimeout(function(){ try{ ov.remove(); }catch(e){} }, 2500); }
+            else { btn.disabled = false; btn.textContent = 'Aceitar e assinar'; er.textContent = (j && j.erro) || 'Não foi possível registrar o aceite.'; } })
+          .catch(function(){ btn.disabled = false; btn.textContent = 'Aceitar e assinar'; er.textContent = 'Sem conexão. Tente de novo.'; });
+      };
+    }
+    // só o Admin vê; o Desenvolvedor e a equipe seguem normalmente
+    carregarTexto(function(){
+      setInterval(function(){
+        if(enviado || !document.body) return;
+        var u = usuario(), deve = !!(u && u.nivel === 'Admin');
+        if(deve && !ov){ montar(); }
+        else if(!deve && ov){ try{ ov.remove(); }catch(e){} ov = null; }
+      }, 1500);
+    });
+  }
   var antes = ler();
   if(antes && antes.bloqueado) bloquear(antes.mensagem, antes.promessa);
   var t = null;
@@ -212,7 +305,7 @@
       .then(function(j){
         if(!j || typeof j.bloqueado !== 'boolean') return;           // painel fora do ar ou sem a função: não mexe em nada
         if(j.bloqueado){ gravar({ bloqueado:true, mensagem:j.mensagem || '', promessa:j.promessa || null }); bloquear(j.mensagem, j.promessa); }
-        else { gravar(null); if(antes && antes.bloqueado) location.reload(); avisarDia(j.aviso); }
+        else { gravar(null); if(antes && antes.bloqueado) location.reload(); avisarDia(j.aviso); if(j.termos && j.termos.pendente) pedirTermos(); }
       }).catch(function(){ clearTimeout(t); });
   }catch(e){}
 })();
