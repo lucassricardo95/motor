@@ -6,7 +6,11 @@
 (function(){
   'use strict';
   const R = window.RESTAURANTE = window.RESTAURANTE || {};
-  const BASE = { slogan:'', assistente:'Assistente', tema:'classico', cores:{ destaque:'#d9a21b', botao:'#8c1c13', fundo:'#14100c' }, logos:{ cardapio:'img/logo.png', impressao:'', icone:'img/icon-512.png' } };
+  /* logo e ícone padrão moram no motor (todo restaurante tem), não no site do restaurante: assim nunca apontam para um arquivo que não existe */
+  const MOTOR = typeof window.MOTOR_URL_ === 'string' ? window.MOTOR_URL_ : '';
+  const BASE = { slogan:'', assistente:'Assistente', tema:'classico', cores:{ destaque:'#d9a21b', botao:'#8c1c13', fundo:'#14100c' }, logos:{ cardapio:MOTOR + 'img/logo.png', impressao:'', icone:MOTOR + 'img/icon-512.png' } };
+  /* logo vazio vindo do painel ou do cache ("sem logo escolhida") não apaga a logo/ícone padrão; só a de impressão pode ficar vazia */
+  const comValor = l => { const o = Object.assign({}, l || {}); ['cardapio', 'icone'].forEach(k => { if(!o[k]) delete o[k]; }); return o; };
   const CHAVE_CACHE = 'marcaRestaurante_v1';
   const HEX = /^#[0-9a-fA-F]{6}$/;
 
@@ -16,7 +20,7 @@
     const cores = Object.assign({}, BASE.cores, a.cores || {}, c.cores || {});
     ['destaque','botao','fundo'].forEach(k => { if(!HEX.test(cores[k])) cores[k] = BASE.cores[k]; });
     return { nome: c.nome || R.nome || 'Meu Restaurante', slogan: c.slogan != null ? c.slogan : (a.slogan || ''), assistente: c.assistente || a.assistente || BASE.assistente,
-      tema: c.tema || a.tema || BASE.tema, cores, logos: Object.assign({}, BASE.logos, a.logos || {}, c.logos || {}) };
+      tema: c.tema || a.tema || BASE.tema, cores, logos: Object.assign({}, BASE.logos, comValor(a.logos), comValor(c.logos)) };
   }
   /* ---------- cores ---------- */
   const h2r = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
