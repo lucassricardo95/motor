@@ -16,7 +16,7 @@ const FOTOS = 'texas-fotos-v1';
 const CODIGO = 'texas-codigo-v6';   // trocou o nome = todo aparelho descarta o cache de código antigo (inclusive cópia vazia)
 const LISTA = [/*LISTA-INICIO*/
   'js/app-00-marca.js?v=319b9568',
-  'js/app-65-aparencia.js?v=7c095723',
+  'js/app-65-aparencia.js?v=93b6d93f',
   'css/estilo-base.css?v=9af376ca',
   'js/app-01-base-e-api.js?v=13ac347f',
   'js/app-02-abas.js?v=ab56e346',
@@ -83,7 +83,7 @@ const LISTA = [/*LISTA-INICIO*/
   'js/app-58-drive-direto.js?v=9e4d8a06',
   'js/app-48-armazenamento.js?v=c4160c65',
   'js/app-32-equipe.js?v=15e8d37a',
-  'css/estilo-sistema.css?v=69a09569',
+  'css/estilo-sistema.css?v=b021fb32',
   'js/app-59-layout.js?v=5aa543db',
   'js/app-61-custos-gerais.js?v=856d2e6d',
   'js/app-62-raio-x.js?v=a9a70e0e',
