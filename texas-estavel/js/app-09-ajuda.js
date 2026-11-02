@@ -192,6 +192,7 @@ Admin:{ nome:'Administrador', secoes:[
     'Na fila (seguem sozinhos na volta): cadastro de cliente, fidelidade, feedback e ocorrência.',
     'Espera a volta (aparece "indisponível até o Supabase voltar" e nada é gravado): mudar status, estoque, compras, relatórios, avisos e Assistente. Anote à mão o que precisar.',
     'A "Saúde do sistema" fica dentro de "Conexão e servidores" (toque na bolinha colorida do topo): bolinha verde, amarela ou vermelha e cada item: cópia para a planilha, backup (diário às 04:00), cópia no Drive, conferência diária de vendas, tarefas automáticas e Assistente.',
+    'Plano grátis do Supabase: em "Conexão e servidores" o cartão "Números do painel do Supabase" guarda Log Ingestion, Log Query e Egress (só aparecem em Supabase → Settings → Usage; digite em GB). Viram barras, avisam perto do limite (70% atenção, 90% problema), lembram depois de 7 dias sem atualizar e vão para o Painel de revenda.',
     'Desenvolvedor: o botão "🧪 Simular queda (treino)" em "Conexão e servidores" finge a queda só neste aparelho, para treinar a equipe. "Encerrar simulação" volta ao normal.' ],
     comuns:['O Guia de operação tem o passo a passo de queda, volta e restauração.'] },
 
