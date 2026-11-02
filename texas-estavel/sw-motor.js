@@ -16,7 +16,7 @@ const FOTOS = 'texas-fotos-v1';
 const CODIGO = 'texas-codigo-v6';   // trocou o nome = todo aparelho descarta o cache de código antigo (inclusive cópia vazia)
 const LISTA = [/*LISTA-INICIO*/
   'js/app-00-marca.js?v=c276f911',
-  'js/app-65-aparencia.js?v=7a753b5b',
+  'js/app-65-aparencia.js?v=7c095723',
   'css/estilo-base.css?v=9af376ca',
   'js/app-01-base-e-api.js?v=ea99e14f',
   'js/app-02-abas.js?v=ab56e346',
