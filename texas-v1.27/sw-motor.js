@@ -17,9 +17,9 @@ const CODIGO = 'texas-codigo-v6';   // trocou o nome = todo aparelho descarta o 
 const LISTA = [/*LISTA-INICIO*/
   'js/app-00-marca.js?v=c276f911',
   'js/app-65-aparencia.js?v=7a753b5b',
-  'css/estilo-base.css?v=766eaafb',
+  'css/estilo-base.css?v=9af376ca',
   'js/app-01-base-e-api.js?v=ea99e14f',
-  'js/app-02-abas.js?v=3ffea325',
+  'js/app-02-abas.js?v=5dd13171',
   'js/app-03-cadastros.js?v=3c5db50a',
   'js/app-04-pedidos-entrega.js?v=8deafaa6',
   'js/app-05-avisos-push.js?v=fe880382',
