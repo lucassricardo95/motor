@@ -1,0 +1,191 @@
+/* =====================================================================
+   MARCA DO RESTAURANTE — nome, cores, logos e ícone do app, vindos de config-restaurante.js
+   e, depois, da tela Administrador → Sistema → Aparência (guardada neste aparelho para abrir já com a marca certa).
+   Carregado ANTES de tudo, para a página nunca "piscar" com outra cor.
+   ===================================================================== */
+(function(){
+  'use strict';
+  const R = window.RESTAURANTE = window.RESTAURANTE || {};
+  const BASE = { slogan:'', assistente:'Assistente', tema:'classico', cores:{ destaque:'#d9a21b', botao:'#8c1c13', fundo:'#14100c' }, logos:{ cardapio:'img/logo.png', impressao:'', icone:'img/icon-512.png' } };
+  const CHAVE_CACHE = 'marcaRestaurante_v1';
+  const HEX = /^#[0-9a-fA-F]{6}$/;
+
+  function lerCache(){ try{ const j = JSON.parse(localStorage.getItem(CHAVE_CACHE) || 'null'); return j && typeof j === 'object' ? j : null; }catch(e){ return null; } }
+  function mesclar(){
+    const c = lerCache() || {}, a = R.marca || {};
+    const cores = Object.assign({}, BASE.cores, a.cores || {}, c.cores || {});
+    ['destaque','botao','fundo'].forEach(k => { if(!HEX.test(cores[k])) cores[k] = BASE.cores[k]; });
+    return { nome: c.nome || R.nome || 'Meu Restaurante', slogan: c.slogan != null ? c.slogan : (a.slogan || ''), assistente: c.assistente || a.assistente || BASE.assistente,
+      tema: c.tema || a.tema || BASE.tema, cores, logos: Object.assign({}, BASE.logos, a.logos || {}, c.logos || {}) };
+  }
+  /* ---------- cores ---------- */
+  const h2r = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
+  const r2h = a => '#' + a.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
+  const mix = (a, b, t) => { const x = h2r(a), y = h2r(b); return r2h(x.map((v, i) => v + (y[i] - v) * t)); };
+  const lum = h => { const [r, g, b] = h2r(h).map(v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }); return .2126 * r + .7152 * g + .0722 * b; };
+  const tinta = h => (lum(h) > .35 ? '#1a1410' : '#ffffff');
+  function paleta(c){
+    const d = c.destaque, b = c.botao, f = c.fundo, claro = '#ffffff', escuro = '#000000';
+    const modoClaro = lum(f) > .4;   /* fundo claro: a "tinta" do texto fica escura e os painéis escurecem em vez de clarear */
+    const lado = modoClaro ? escuro : claro;                 /* direção em que painéis e linhas se afastam do fundo */
+    const cream = modoClaro ? mix(escuro, d, .10) : mix(claro, d, .10);   /* cor do texto */
+    const eqB = modoClaro ? mix(f, escuro, .04) : mix(f, escuro, .12), eqC = modoClaro ? mix(escuro, d, .06) : mix(claro, d, .05);
+    return {
+      '--bg-campo': modoClaro ? mix(f, claro, .7) : '#100c09', '--bg-hero': modoClaro ? mix(f, escuro, .05) : escuro, '--bg-barra': modoClaro ? mix(f, claro, .06) : mix(f, escuro, .03), '--bg': f, '--panel': mix(f, lado, modoClaro ? .04 : .05), '--panel-2': mix(f, lado, modoClaro ? .08 : .09), '--line': mix(f, modoClaro ? escuro : d, modoClaro ? .16 : .22), '--line-forte': mix(f, modoClaro ? escuro : d, modoClaro ? .30 : .38),
+      '--gold': d, '--gold-rgb': h2r(d).join(','), '--gold-hi': mix(d, claro, .22), '--gold-lo': mix(d, escuro, .28), '--gold-dim': mix(d, escuro, .22),
+      '--red': b, '--red-rgb': h2r(b).join(','), '--red-hi': mix(b, claro, .18), '--red-dim': mix(b, escuro, .32),
+      '--on-gold': tinta(d), '--cream': cream, '--muted': mix(cream, f, modoClaro ? .45 : .40),
+      '--eq-bg': eqB, '--eq-panel': mix(eqB, lado, modoClaro ? .05 : .06), '--eq-panel-2': mix(eqB, lado, modoClaro ? .09 : .10), '--eq-panel-3': mix(eqB, lado, modoClaro ? .13 : .14),
+      '--eq-line': modoClaro ? 'rgba(0,0,0,.12)' : 'rgba(255,236,200,.09)', '--eq-line-forte': modoClaro ? 'rgba(0,0,0,.22)' : 'rgba(255,236,200,.16)', '--eq-cream': eqC, '--eq-muted': mix(eqC, eqB, .42), 'color-scheme': modoClaro ? 'light' : 'dark'
+    };
+  }
+  function pintar(m){
+    let st = document.getElementById('marcaCss');
+    if(!st){ st = document.createElement('style'); st.id = 'marcaCss'; (document.head || document.documentElement).appendChild(st); }
+    /* Tema original "Brasa" (dourado/vermelho/marrom-escuro): usa as cores escritas à mão no CSS, sem recalcular, para ficar idêntico ao visual aprovado. */
+    const c0 = m.cores || {};
+    if(String(c0.destaque).toLowerCase() === '#e0b53a' && String(c0.botao).toLowerCase() === '#d20807' && String(c0.fundo).toLowerCase() === '#0b0705'){ st.textContent = ''; document.documentElement.setAttribute('data-modo', 'escuro'); return; }
+    const p = paleta(m.cores);
+    document.documentElement.setAttribute('data-modo', lum(m.cores.fundo) > .4 ? 'claro' : 'escuro');
+    st.textContent = 'html:root{' + Object.keys(p).map(k => k + ':' + p[k] + ';').join('') + '}';
+  }
+  /* ---------- manifesto do app (nome, cor e ícone do restaurante) ---------- */
+  function absoluta(u){ try{ return new URL(u, location.href).href; }catch(e){ return u; } }
+  function manifesto(m){
+    try{
+      const ic = absoluta(m.logos.icone || BASE.logos.icone), base = location.href.split('?')[0].replace(/[^/]*$/, '');
+      const j = { id:base, name:m.nome, short_name:m.nome.length > 14 ? m.nome.slice(0, 14) : m.nome, description:'Cardápio digital e pedidos de ' + m.nome, lang:'pt-BR', start_url:base, scope:base, display:'standalone', orientation:'any',
+        background_color:m.cores.fundo, theme_color:m.cores.fundo, icons:[{ src:ic, sizes:'512x512', type:'image/png', purpose:'any' }, { src:ic, sizes:'512x512', type:'image/png', purpose:'maskable' }] };
+      const url = URL.createObjectURL(new Blob([JSON.stringify(j)], { type:'application/manifest+json' }));
+      let l = document.querySelector('link[rel="manifest"]'); if(!l){ l = document.createElement('link'); l.rel = 'manifest'; document.head.appendChild(l); }
+      l.href = url;
+    }catch(e){}
+  }
+  function textos(m){
+    document.title = m.nome;
+    const t = document.querySelector('meta[name="theme-color"]'); if(t) t.content = m.cores.fundo;
+    const a = document.querySelector('meta[name="apple-mobile-web-app-title"]'); if(a) a.content = m.nome;
+    const ic = document.querySelector('link[rel="icon"]'); if(ic && m.logos.icone) ic.href = m.logos.icone;
+    const ap = document.querySelector('link[rel="apple-touch-icon"]'); if(ap && m.logos.icone) ap.href = m.logos.icone;
+    document.querySelectorAll('[data-marca-logo]').forEach(i => { const u = m.logos[i.getAttribute('data-marca-logo')] || m.logos.cardapio; if(u && i.getAttribute('src') !== u) i.setAttribute('src', u); i.setAttribute('alt', m.nome); });
+    document.querySelectorAll('[data-marca-nome]').forEach(e => { e.textContent = m.nome; });
+    document.querySelectorAll('[data-marca-icone]').forEach(i => { if(m.logos.icone) i.setAttribute('src', m.logos.icone); });
+    const sp = document.getElementById('txbSplashCss'); if(sp) sp.textContent = 'html.txb-equipe::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;background:' + m.cores.fundo + ' url(' + (m.logos.cardapio || '') + ') center center/min(52vw,210px) auto no-repeat;}';
+  }
+  function aplicar(){ const m = window.MARCA = mesclar(); window.NOME_RESTAURANTE_ = m.nome; window.ASSISTENTE_ = m.assistente || 'Assistente'; pintar(m); textos(m); manifesto(m); return m; }
+  window.marcaAplicar_ = aplicar;
+  /* Guarda a marca vinda do banco (Aparência) e aplica na hora */
+  window.marcaGuardar_ = function(parcial){ try{ const c = Object.assign(lerCache() || {}, parcial || {}); localStorage.setItem(CHAVE_CACHE, JSON.stringify(c)); }catch(e){} return aplicar(); };
+  const escH_ = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+  window.ASSISTENTE_H_ = () => escH_(window.ASSISTENTE_);
+  window.NOME_UP_ = () => String(window.NOME_RESTAURANTE_ || '').toUpperCase();
+  window.NOME_H_ = () => escH_(window.NOME_RESTAURANTE_);
+  window.NOME_UP_H_ = () => escH_(window.NOME_UP_());
+  window.marcaLimpar_ = function(){ try{ localStorage.removeItem(CHAVE_CACHE); }catch(e){} return aplicar(); };
+  window.marcaPaleta_ = paleta;
+  window.kickerPadrao_ = function(){ const m = window.MARCA || {}; return m.slogan ? 'DELIVERY · ' + String(m.slogan).toUpperCase() : 'DELIVERY'; };
+  aplicar();
+  document.addEventListener('DOMContentLoaded', function(){ textos(window.MARCA);
+    if(!R.supabaseUrl){
+      const d = document.createElement('div');
+      d.style.cssText = 'position:fixed;inset:0;z-index:2147483001;background:#14100c;color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:sans-serif';
+      d.innerHTML = '<div style="max-width:420px"><h2 style="margin:0 0 10px">Sistema ainda não configurado</h2><p style="line-height:1.5;opacity:.85">Este restaurante ainda não recebeu as ligações com o banco de dados. Peça a quem implantou o sistema para gerar o arquivo <b>config-restaurante.js</b> no Painel de Revenda.</p></div>';
+      document.body.appendChild(d);
+    } });
+})();
+
+/* =====================================================================
+   ACESSO SUSPENSO — o fornecedor do sistema pode bloquear o restaurante (botão "Bloquear acesso" no Painel de Revenda).
+   Nunca é automático. A verificação é feita pelo endereço do banco do restaurante (não dá para escapar trocando o nome).
+   Sem internet ou se o painel não responder: o sistema continua abrindo (só vale o último bloqueio já visto neste aparelho).
+   ===================================================================== */
+(function(){
+  'use strict';
+  var PAINEL = 'https://shbhclxhlffdusikjeqp.supabase.co', CHAVE = 'sb_publishable_0u_j3zKFnJDkhN57KRJ9Ng_7uN24jl4', FLAG = 'rvAcessoSuspenso_v1';
+  var R = window.RESTAURANTE || {}, FETCH = window.fetch.bind(window);
+  if(!R.supabaseUrl && !R.slug) return;
+  function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
+  function ler(){ try{ return JSON.parse(localStorage.getItem(FLAG) || 'null'); }catch(e){ return null; } }
+  function gravar(v){ try{ if(v) localStorage.setItem(FLAG, JSON.stringify(v)); else localStorage.removeItem(FLAG); }catch(e){} }
+  function bloquear(msg){
+    try{ window.stop(); }catch(e){}
+    try{ window.fetch = function(){ return Promise.reject(new Error('Acesso suspenso')); }; }catch(e){}
+    function pintar(){
+      var d = document.documentElement; if(!d) return;
+      d.innerHTML = '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Acesso suspenso</title></head>'
+        + '<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;color:#f3ecec;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px;box-sizing:border-box">'
+        + '<div style="max-width:420px"><div style="font-size:54px">⛔</div><h1 style="margin:10px 0 8px;font-size:24px">Acesso suspenso</h1>'
+        + '<p style="color:#cfc4c4;margin:0 0 20px">' + esc(msg || 'O acesso a este sistema está suspenso. Fale com o fornecedor do sistema.') + '</p>'
+        + '<button onclick="location.reload()" style="font:inherit;padding:12px 22px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700">Verificar de novo</button></div></body>';
+    }
+    function guardar(){
+      try{ var b = document.body; if(!b || b.__rvGuarda) return; b.__rvGuarda = true;
+        new MutationObserver(function(ms){ ms.forEach(function(m){ m.addedNodes.forEach(function(n){ if(n.parentNode === b && !n.__rv) b.removeChild(n); }); }); }).observe(b, { childList:true });
+        Array.prototype.forEach.call(b.children, function(n){ n.__rv = true; });
+      }catch(e){}
+    }
+    window.addEventListener('unhandledrejection', function(e){ e.preventDefault(); }, true);
+    window.addEventListener('error', function(e){ e.stopImmediatePropagation(); }, true);
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ pintar(); guardar(); }); else { pintar(); guardar(); }
+    pintar(); guardar();
+  }
+  var antes = ler();
+  if(antes && antes.bloqueado) bloquear(antes.mensagem);
+  var t = null;
+  try{
+    var c = new AbortController(); t = setTimeout(function(){ c.abort(); }, 6000);
+    FETCH(PAINEL + '/rest/v1/rpc/status_restaurante', { method:'POST', signal:c.signal, headers:{ apikey:CHAVE, 'Content-Type':'application/json' },
+      body: JSON.stringify({ p_slug: R.slug || '', p_url: R.supabaseUrl || '' }) })
+      .then(function(r){ clearTimeout(t); return r.ok ? r.json() : null; })
+      .then(function(j){
+        if(!j || typeof j.bloqueado !== 'boolean') return;           // painel fora do ar ou sem a função: não mexe em nada
+        if(j.bloqueado){ gravar({ bloqueado:true, mensagem:j.mensagem || '' }); if(!(antes && antes.bloqueado)) bloquear(j.mensagem); }
+        else { gravar(null); if(antes && antes.bloqueado) location.reload(); }
+      }).catch(function(){ clearTimeout(t); });
+  }catch(e){}
+})();
+
+/* =====================================================================
+   AVISO DE ERROS — os erros de tela do app chegam ao fornecedor (tabela erros_app do Painel de Revenda), para serem corrigidos.
+   Vai só: restaurante, tela, texto do erro, arquivo/linha, versão do sistema e tipo de aparelho. Nenhum dado de cliente, venda, senha ou telefone.
+   O mesmo erro repetido conta uma vez só (contador no painel). Sem internet ou se o painel não responder: nada acontece.
+   ===================================================================== */
+(function(){
+  'use strict';
+  var PAINEL = 'https://shbhclxhlffdusikjeqp.supabase.co', CHAVE = 'sb_publishable_0u_j3zKFnJDkhN57KRJ9Ng_7uN24jl4';
+  var R = window.RESTAURANTE || {}, FETCH = window.fetch.bind(window), vistos = {}, total = 0;
+  if(!R.slug) return;
+  var RUIDO = /ResizeObserver|Script error\.?$|Failed to fetch|NetworkError|Load failed|AbortError|Acesso suspenso|The operation was aborted|chrome-extension|moz-extension|Non-Error promise rejection|network request failed/i;
+  function aparelho(){
+    var u = navigator.userAgent || '', so = (u.match(/Android [\d.]+|iPhone OS [\d_]+|iPad|Windows NT [\d.]+|Mac OS X [\d_]+|Linux/) || [''])[0].replace(/_/g, '.');
+    var nav = (u.match(/(SamsungBrowser|Edg|Firefox|CriOS|Chrome|Safari)\/(\d+)/) || ['', '', ''])[0];
+    return (so + ' ' + nav).trim();
+  }
+  function tela(){
+    try{ var a = document.querySelector('[id^="tab-"].active'); if(a) return a.id.replace(/^tab-/, ''); }catch(e){}
+    try{ if(document.documentElement.classList.contains('txb-equipe')) return 'equipe'; }catch(e){}
+    return 'cardapio';
+  }
+  function versao(){ try{ return String(window.MOTOR_URL_ || '').replace(/\/+$/, '').split('/').pop(); }catch(e){ return ''; } }
+  function limpa(s){ return String(s == null ? '' : s).replace(/https?:\/\/[^\s)]*?\/([^\/\s)?#]+)(\?[^\s)]*)?/g, '$1').replace(/\s+/g, ' ').trim(); }
+  function enviar(msg, detalhe){
+    try{
+      msg = limpa(msg).slice(0, 400); if(!msg || RUIDO.test(msg)) return;
+      var t = tela(), k = msg + '|' + t;
+      if(vistos[k] || total >= 20) return; vistos[k] = 1; total++;
+      FETCH(PAINEL + '/rest/v1/rpc/registrar_erro', { method:'POST', keepalive:true, headers:{ apikey:CHAVE, 'Content-Type':'application/json' },
+        body: JSON.stringify({ p:{ slug:R.slug, tela:t, mensagem:msg, detalhe:limpa(detalhe).slice(0, 1500), versao:versao(), aparelho:aparelho() } }) }).catch(function(){});
+    }catch(e){}
+  }
+  window.addEventListener('error', function(ev){
+    if(!ev) return;
+    var m = ev.message || (ev.error && ev.error.message) || '';
+    var onde = ev.filename ? (limpa(ev.filename) + ':' + (ev.lineno || 0) + ':' + (ev.colno || 0)) : '';
+    enviar(m, onde + ' ' + ((ev.error && ev.error.stack) || ''));
+  });
+  window.addEventListener('unhandledrejection', function(ev){
+    var r = ev && ev.reason, m = r && (r.message || (typeof r === 'string' ? r : ''));
+    enviar(m || '', (r && r.stack) || '');
+  });
+  window.rvRegistrarErro = enviar;   // usado pelos avisos de erro do próprio sistema
+})();

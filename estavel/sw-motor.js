@@ -15,7 +15,7 @@ const FOTOS = 'fotos-v1';
    A lista abaixo é gerada pelo script de selagem (selar.py) a cada entrega. */
 const CODIGO = 'codigo-v1';   // trocou o nome = todo aparelho descarta o cache de código antigo (inclusive cópia vazia)
 const LISTA = [/*LISTA-INICIO*/
-  'js/app-00-marca.js?v=c276f911',
+  'js/app-00-marca.js?v=752a1bfa',
   'css/estilo-base.css?v=9af376ca',
   'js/app-01-base-e-api.js?v=365a9da4',
   'js/app-02-abas.js?v=ab56e346',
@@ -25,7 +25,7 @@ const LISTA = [/*LISTA-INICIO*/
   'js/app-06-caixa.js?v=1a2541c4',
   'js/app-07-impressao.js?v=3deae066',
   'js/app-08-vendas-despesas.js?v=0b8d9a34',
-  'js/app-09-ajuda.js?v=b3482298',
+  'js/app-09-ajuda.js?v=3e7f79f3',
   'js/app-10-backup-financeiro.js?v=f3d08c92',
   'js/app-11-admin-integracoes.js?v=ac6dea84',
   'js/app-12-gestao-ia.js?v=9c37098f',

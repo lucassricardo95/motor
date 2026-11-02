@@ -144,3 +144,48 @@
       }).catch(function(){ clearTimeout(t); });
   }catch(e){}
 })();
+
+/* =====================================================================
+   AVISO DE ERROS — os erros de tela do app chegam ao fornecedor (tabela erros_app do Painel de Revenda), para serem corrigidos.
+   Vai só: restaurante, tela, texto do erro, arquivo/linha, versão do sistema e tipo de aparelho. Nenhum dado de cliente, venda, senha ou telefone.
+   O mesmo erro repetido conta uma vez só (contador no painel). Sem internet ou se o painel não responder: nada acontece.
+   ===================================================================== */
+(function(){
+  'use strict';
+  var PAINEL = 'https://shbhclxhlffdusikjeqp.supabase.co', CHAVE = 'sb_publishable_0u_j3zKFnJDkhN57KRJ9Ng_7uN24jl4';
+  var R = window.RESTAURANTE || {}, FETCH = window.fetch.bind(window), vistos = {}, total = 0;
+  if(!R.slug) return;
+  var RUIDO = /ResizeObserver|Script error\.?$|Failed to fetch|NetworkError|Load failed|AbortError|Acesso suspenso|The operation was aborted|chrome-extension|moz-extension|Non-Error promise rejection|network request failed/i;
+  function aparelho(){
+    var u = navigator.userAgent || '', so = (u.match(/Android [\d.]+|iPhone OS [\d_]+|iPad|Windows NT [\d.]+|Mac OS X [\d_]+|Linux/) || [''])[0].replace(/_/g, '.');
+    var nav = (u.match(/(SamsungBrowser|Edg|Firefox|CriOS|Chrome|Safari)\/(\d+)/) || ['', '', ''])[0];
+    return (so + ' ' + nav).trim();
+  }
+  function tela(){
+    try{ var a = document.querySelector('[id^="tab-"].active'); if(a) return a.id.replace(/^tab-/, ''); }catch(e){}
+    try{ if(document.documentElement.classList.contains('txb-equipe')) return 'equipe'; }catch(e){}
+    return 'cardapio';
+  }
+  function versao(){ try{ return String(window.MOTOR_URL_ || '').replace(/\/+$/, '').split('/').pop(); }catch(e){ return ''; } }
+  function limpa(s){ return String(s == null ? '' : s).replace(/https?:\/\/[^\s)]*?\/([^\/\s)?#]+)(\?[^\s)]*)?/g, '$1').replace(/\s+/g, ' ').trim(); }
+  function enviar(msg, detalhe){
+    try{
+      msg = limpa(msg).slice(0, 400); if(!msg || RUIDO.test(msg)) return;
+      var t = tela(), k = msg + '|' + t;
+      if(vistos[k] || total >= 20) return; vistos[k] = 1; total++;
+      FETCH(PAINEL + '/rest/v1/rpc/registrar_erro', { method:'POST', keepalive:true, headers:{ apikey:CHAVE, 'Content-Type':'application/json' },
+        body: JSON.stringify({ p:{ slug:R.slug, tela:t, mensagem:msg, detalhe:limpa(detalhe).slice(0, 1500), versao:versao(), aparelho:aparelho() } }) }).catch(function(){});
+    }catch(e){}
+  }
+  window.addEventListener('error', function(ev){
+    if(!ev) return;
+    var m = ev.message || (ev.error && ev.error.message) || '';
+    var onde = ev.filename ? (limpa(ev.filename) + ':' + (ev.lineno || 0) + ':' + (ev.colno || 0)) : '';
+    enviar(m, onde + ' ' + ((ev.error && ev.error.stack) || ''));
+  });
+  window.addEventListener('unhandledrejection', function(ev){
+    var r = ev && ev.reason, m = r && (r.message || (typeof r === 'string' ? r : ''));
+    enviar(m || '', (r && r.stack) || '');
+  });
+  window.rvRegistrarErro = enviar;   // usado pelos avisos de erro do próprio sistema
+})();
