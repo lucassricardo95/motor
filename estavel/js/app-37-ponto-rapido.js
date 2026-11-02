@@ -10,7 +10,7 @@ function prBotao_(){ return document.getElementById('prBtnTopo'); }
 async function prVisibilidade_(forcar){
   const b = prBotao_(); if(!b) return;
   if(typeof currentUser === 'undefined' || !currentUser || typeof apiConfigurada === 'function' && !apiConfigurada()){ b.style.display = 'none'; return; }
-  if(forcar === true || prVinculado_ === null || Date.now() - prUltimaConsulta_ > 90000){
+  if(forcar === true || prVinculado_ === null || Date.now() - prUltimaConsulta_ > (prVinculado_ === false ? 600000 : 90000)){   // sem vínculo com funcionário: confere a cada 10 min
     prUltimaConsulta_ = Date.now();
     try{
       const e = await apiCall('pontoEstado', {});

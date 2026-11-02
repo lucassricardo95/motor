@@ -60,7 +60,7 @@ async function minhaExtrasCarregar_(forcar){
   const ex = document.getElementById('minhaEscalaExtra'), card = document.getElementById('minhaEscalaCard');
   try{ if(typeof prAtualizar_ === 'function') prAtualizar_(forcar === true); }catch(err){}
   if(!ex || !card || card.style.display === 'none') return;
-  if(forcar !== true && ex.innerHTML && Date.now() - minhaExtrasUlt_ < 90000) return;
+  if(forcar !== true && Date.now() - minhaExtrasUlt_ < (typeof prVinculado_ !== 'undefined' && prVinculado_ === false ? 600000 : 90000) && (ex.innerHTML || prVinculado_ === false)) return;
   minhaExtrasUlt_ = Date.now();
   try{ const r = await minhaExtrasHtml_(); ex.innerHTML = r.h; }catch(err){ ex.innerHTML = ''; minhaExtrasUlt_ = 0; }
 }
