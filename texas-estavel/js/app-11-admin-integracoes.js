@@ -107,15 +107,6 @@ function saudePlanoBarra_(it){
     return window.armBarra_(escH(tit.charAt(0).toUpperCase() + tit.slice(1)), escH(uso), escH(lim), Math.round(pct * 10) / 10, extra);
   }catch(e){ return null; }
 }
-async function salvarUsoSupabase_(){
-  const g = id => (document.getElementById(id)||{}).value || '';
-  try{
-    const r = await apiCall('usoSupabaseSalvar', { logIngestion: g('usoLogIng'), logQuery: g('usoLogQry'), egress: g('usoLogEgr') });
-    showMsg('usoSupMsg', (r && r.message) || 'Não foi possível salvar.', r && r.ok ? 'ok' : 'warn');
-    if(r && r.ok) carregarSaude_();
-  }catch(e){ showMsg('usoSupMsg', 'Sem conexão. Tente de novo.', 'warn'); }
-}
-window.salvarUsoSupabase_ = salvarUsoSupabase_;
 async function carregarSaude_(){
   const card = document.getElementById('saudeCard'), sec = document.getElementById('saudeSecao'), topo = document.getElementById('saudeTopoBox');
   const nivel = currentUser && currentUser.nivel; const pode = (nivel==='Admin' || nivel==='Desenvolvedor');
@@ -143,17 +134,7 @@ async function carregarSaude_(){
     // 2) plano grátis em barras
     const barras = [], semBarra = [];
     itens.filter(ehPlano).forEach(i=>{ const b = saudePlanoBarra_(i); if(b) barras.push(b); else semBarra.push(i); });
-    const digitando = !!(document.activeElement && /^usoLog/.test(document.activeElement.id||''));   // não apaga o que está sendo digitado
-    if(plano && !digitando) plano.innerHTML = barras.length ? '<div class="cx-titulo">📊 Plano grátis do Supabase</div><div class="cx-card" style="padding:8px 14px 2px;">' + barras.join('') + '</div>' : '';
-    // 2b) logs e transferência: só aparecem no painel do Supabase (Settings → Usage); o Admin digita e o sistema acompanha
-    if(plano && !digitando){
-      const lg = itens.find(i=>i.id==='uso_logs'), vv = (lg && lg.v) || {}, fmt = x => (x==null ? '' : String(x).replace('.', ','));
-      const campo = (id, rot, val) => '<label class="fs-xs" style="display:block;margin:4px 0;">' + rot + '<br><input id="' + id + '" inputmode="decimal" style="width:120px;" value="' + escH(fmt(val)) + '" placeholder="0,000"> GB</label>';
-      plano.innerHTML += '<div class="cx-card" style="padding:10px 14px;margin-top:8px;"><b>📝 Números do painel do Supabase</b>'
-        + '<div class="fs-xs" style="color:var(--muted);margin:2px 0 6px;">No Supabase abra Settings → Usage e digite aqui o que aparece (em GB). Esses 3 só existem lá; o sistema não consegue medir sozinho.' + (vv.em ? ' Última atualização: ' + escH(vv.em) + '.' : '') + '</div>'
-        + campo('usoLogIng', 'Log Ingestion (limite 1 GB)', vv.ing) + campo('usoLogQry', 'Log Query (limite 100 GB)', vv.qry) + campo('usoLogEgr', 'Egress (limite 5 GB)', vv.egr)
-        + '<button class="btn" type="button" onclick="salvarUsoSupabase_()" style="margin-top:4px;">Salvar números</button><span id="usoSupMsg" class="fs-xs" style="margin-left:8px;"></span></div>';
-    }
+    if(plano) plano.innerHTML = barras.length ? '<div class="cx-titulo">📊 Plano grátis do Supabase</div><div class="cx-card" style="padding:8px 14px 2px;">' + barras.join('') + '</div>' : '';
     // 3) o resto, recolhido: uma linha por verificação
     const resto = itens.filter(i=>!ehPlano(i) || semBarra.includes(i));
     if(tit) tit.textContent = 'Todas as verificações (' + resto.length + ')';
