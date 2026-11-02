@@ -111,17 +111,53 @@
   function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, function(c){ return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]; }); }
   function ler(){ try{ return JSON.parse(localStorage.getItem(FLAG) || 'null'); }catch(e){ return null; } }
   function gravar(v){ try{ if(v) localStorage.setItem(FLAG, JSON.stringify(v)); else localStorage.removeItem(FLAG); }catch(e){} }
-  function bloquear(msg){
+  var estado = { msg:'', prom:null }, ativo = false, repintar = function(){}, enviando = false;
+  function dataBr(d){ return String(d || '').split('-').reverse().join('/'); }
+  function corpoPromessa(){
+    var p = estado.prom;
+    if(p && p.estado === 'pendente') return '<div style="background:#1d1d1d;border:1px solid #3a3a3a;border-radius:12px;padding:12px;margin:0 0 16px"><b>⏳ Promessa de pagamento enviada</b><br><span style="color:#cfc4c4;font-size:14px">Pagamento prometido para ' + esc(dataBr(p.data)) + '. Aguarde a aprovação do fornecedor: esta tela libera sozinha quando for aprovado.</span></div>';
+    var rec = (p && p.estado === 'recusada') ? '<div style="color:#ff8a8a;font-size:14px;margin:0 0 10px">O último pedido não foi aprovado. Fale com o fornecedor do sistema.</div>' : '';
+    var hj = new Date(), mx = new Date(Date.now() + 15 * 86400000);
+    function iso(d){ return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+    return rec + '<div id="rvPromBox" style="margin:0 0 16px"><button onclick="document.getElementById(\'rvPromForm\').style.display=\'block\';this.style.display=\'none\'" style="font:inherit;padding:11px 20px;border:1px solid #d4262c;border-radius:12px;background:transparent;color:#f3ecec;font-weight:700">🤝 Prometer pagamento</button>'
+      + '<div id="rvPromForm" style="display:none;text-align:left;background:#1d1d1d;border:1px solid #3a3a3a;border-radius:12px;padding:12px;margin-top:8px"><label style="font-size:14px;color:#cfc4c4">Em que dia você vai pagar?</label>'
+      + '<input id="rvPromData" type="date" min="' + iso(hj) + '" max="' + iso(mx) + '" style="width:100%;box-sizing:border-box;margin:6px 0 10px;padding:10px;border-radius:10px;border:1px solid #444;background:#0a0a0a;color:#fff;font:inherit">'
+      + '<label style="font-size:14px;color:#cfc4c4">Seu nome ou WhatsApp (para o fornecedor te responder)</label>'
+      + '<input id="rvPromContato" maxlength="120" style="width:100%;box-sizing:border-box;margin:6px 0 10px;padding:10px;border-radius:10px;border:1px solid #444;background:#0a0a0a;color:#fff;font:inherit">'
+      + '<div id="rvPromMsg" style="color:#ff8a8a;font-size:14px;min-height:18px"></div>'
+      + '<button onclick="window.__rvPedirPromessa()" style="font:inherit;padding:11px 20px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700;width:100%">Enviar pedido</button>'
+      + '<div style="color:#9a8f8f;font-size:12px;margin-top:8px">O pedido só vale depois que o fornecedor aprovar.</div></div></div>';
+  }
+  window.__rvPedirPromessa = function(){
+    if(enviando) return;
+    var d = (document.getElementById('rvPromData') || {}).value, c = (document.getElementById('rvPromContato') || {}).value, m = document.getElementById('rvPromMsg');
+    if(!d){ if(m) m.textContent = 'Escolha o dia do pagamento.'; return; }
+    if(!c || !c.trim()){ if(m) m.textContent = 'Informe seu nome ou WhatsApp.'; return; }
+    enviando = true; if(m) m.textContent = 'Enviando…';
+    FETCH(PAINEL + '/rest/v1/rpc/pedir_promessa', { method:'POST', headers:{ apikey:CHAVE, 'Content-Type':'application/json' },
+      body: JSON.stringify({ p_slug: R.slug || '', p_url: R.supabaseUrl || '', p_data: d, p_contato: c.trim() }) })
+      .then(function(r){ return r.ok ? r.json() : { ok:false, erro:'Não foi possível enviar agora. Tente de novo em instantes.' }; })
+      .then(function(j){ enviando = false;
+        if(j && j.ok){ estado.prom = { estado:'pendente', data:d }; gravar({ bloqueado:true, mensagem:estado.msg, promessa:estado.prom }); repintar(); }
+        else if(m) m.textContent = (j && j.erro) || 'Não foi possível enviar.'; })
+      .catch(function(){ enviando = false; if(m) m.textContent = 'Sem conexão. Tente de novo.'; });
+  };
+  function bloquear(msg, prom){
+    estado.msg = msg; estado.prom = prom || null;
+    if(ativo){ repintar(); return; }
+    ativo = true;
     try{ window.stop(); }catch(e){}
     try{ window.fetch = function(){ return Promise.reject(new Error('Acesso suspenso')); }; }catch(e){}
     function pintar(){
       var d = document.documentElement; if(!d) return;
       d.innerHTML = '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Acesso suspenso</title></head>'
         + '<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;color:#f3ecec;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px;box-sizing:border-box">'
-        + '<div style="max-width:420px"><div style="font-size:54px">⛔</div><h1 style="margin:10px 0 8px;font-size:24px">Acesso suspenso</h1>'
-        + '<p style="color:#cfc4c4;margin:0 0 20px">' + esc(msg || 'O acesso a este sistema está suspenso. Fale com o fornecedor do sistema.') + '</p>'
+        + '<div style="max-width:420px;width:100%"><div style="font-size:54px">⛔</div><h1 style="margin:10px 0 8px;font-size:24px">Acesso suspenso</h1>'
+        + '<p style="color:#cfc4c4;margin:0 0 20px">' + esc(estado.msg || 'O acesso a este sistema está suspenso. Fale com o fornecedor do sistema.') + '</p>'
+        + corpoPromessa()
         + '<button onclick="location.reload()" style="font:inherit;padding:12px 22px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700">Verificar de novo</button></div></body>';
     }
+    repintar = function(){ pintar(); guardar(); };
     function guardar(){
       try{ var b = document.body; if(!b || b.__rvGuarda) return; b.__rvGuarda = true;
         new MutationObserver(function(ms){ ms.forEach(function(m){ m.addedNodes.forEach(function(n){ if(n.parentNode === b && !n.__rv) b.removeChild(n); }); }); }).observe(b, { childList:true });
@@ -132,9 +168,41 @@
     window.addEventListener('error', function(e){ e.stopImmediatePropagation(); }, true);
     if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ pintar(); guardar(); }); else { pintar(); guardar(); }
     pintar(); guardar();
+    // enquanto bloqueado, pergunta ao painel a cada minuto; liberou (ou promessa aprovada) = recarrega sozinho
+    setInterval(function(){
+      FETCH(PAINEL + '/rest/v1/rpc/status_restaurante', { method:'POST', headers:{ apikey:CHAVE, 'Content-Type':'application/json' }, body: JSON.stringify({ p_slug: R.slug || '', p_url: R.supabaseUrl || '' }) })
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .then(function(j){ if(!j || typeof j.bloqueado !== 'boolean') return;
+          if(!j.bloqueado){ gravar(null); setTimeout(function(){ location.reload(); }, 1500); return; }
+          var novo = JSON.stringify(j.promessa || null); if(novo !== JSON.stringify(estado.prom || null) && !((document.getElementById('rvPromData') || {}).value)){ estado.prom = j.promessa || null; gravar({ bloqueado:true, mensagem:estado.msg, promessa:estado.prom }); repintar(); } })
+        .catch(function(){});
+    }, 60000);
+  }
+  /* AVISO DE VENCIMENTO / PROMESSA — aparece uma vez por dia, só para administradores (Admin e Desenvolvedor). */
+  function avisarDia(av){
+    try{
+      if(!av) return;
+      var hoje = new Date(), dia = hoje.getFullYear() + '-' + (hoje.getMonth() + 1) + '-' + hoje.getDate();
+      if(localStorage.getItem('rvAvisoDia_v1') === dia) return;
+      var txt = av.tipo === 'promessa'
+        ? 'O acesso está liberado por promessa de pagamento até <b>' + esc(dataBr(av.ate)) + '</b>. Depois dessa data o acesso é suspenso de novo se o pagamento não for confirmado.'
+        : 'A mensalidade do sistema vence ' + (av.dias <= 0 ? '<b>hoje</b>' : av.dias === 1 ? '<b>amanhã</b>' : 'em <b>' + av.dias + ' dias</b>') + ' (' + esc(dataBr(av.vencimento)) + '). Pague em dia para não ter o acesso suspenso.';
+      var tent = 0, t = setInterval(function(){
+        tent++; if(tent > 600){ clearInterval(t); return; }
+        var u; try{ u = (typeof currentUser !== 'undefined') ? currentUser : null; }catch(e){ u = null; }
+        if(!u || (u.nivel !== 'Admin' && u.nivel !== 'Desenvolvedor') || !document.body) return;
+        clearInterval(t);
+        try{ localStorage.setItem('rvAvisoDia_v1', dia); }catch(e){}
+        var d = document.createElement('div');
+        d.style.cssText = 'position:fixed;inset:0;z-index:2147483000;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;padding:24px;font-family:system-ui,sans-serif';
+        d.innerHTML = '<div style="max-width:380px;background:#1a1a1a;color:#f3ecec;border:1px solid #d4262c;border-radius:16px;padding:20px;text-align:center;line-height:1.5"><div style="font-size:40px">' + (av.tipo === 'promessa' ? '🤝' : '🔔') + '</div><h3 style="margin:6px 0 8px">Aviso do sistema</h3><p style="margin:0 0 16px;color:#cfc4c4">' + txt + '</p><button style="font:inherit;padding:11px 24px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700">Entendi</button></div>';
+        d.querySelector('button').onclick = function(){ d.remove(); };
+        document.body.appendChild(d);
+      }, 1000);
+    }catch(e){}
   }
   var antes = ler();
-  if(antes && antes.bloqueado) bloquear(antes.mensagem);
+  if(antes && antes.bloqueado) bloquear(antes.mensagem, antes.promessa);
   var t = null;
   try{
     var c = new AbortController(); t = setTimeout(function(){ c.abort(); }, 6000);
@@ -143,8 +211,8 @@
       .then(function(r){ clearTimeout(t); return r.ok ? r.json() : null; })
       .then(function(j){
         if(!j || typeof j.bloqueado !== 'boolean') return;           // painel fora do ar ou sem a função: não mexe em nada
-        if(j.bloqueado){ gravar({ bloqueado:true, mensagem:j.mensagem || '' }); if(!(antes && antes.bloqueado)) bloquear(j.mensagem); }
-        else { gravar(null); if(antes && antes.bloqueado) location.reload(); }
+        if(j.bloqueado){ gravar({ bloqueado:true, mensagem:j.mensagem || '', promessa:j.promessa || null }); bloquear(j.mensagem, j.promessa); }
+        else { gravar(null); if(antes && antes.bloqueado) location.reload(); avisarDia(j.aviso); }
       }).catch(function(){ clearTimeout(t); });
   }catch(e){}
 })();
