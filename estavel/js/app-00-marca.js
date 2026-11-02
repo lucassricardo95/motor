@@ -146,28 +146,29 @@
     estado.msg = msg; estado.prom = prom || null;
     if(ativo){ repintar(); return; }
     ativo = true;
-    try{ window.stop(); }catch(e){}
-    try{ window.fetch = function(){ return Promise.reject(new Error('Acesso suspenso')); }; }catch(e){}
-    function pintar(){
-      var d = document.documentElement; if(!d) return;
-      d.innerHTML = '<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Acesso suspenso</title></head>'
-        + '<body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0a0a0a;color:#f3ecec;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px;box-sizing:border-box">'
-        + '<div style="max-width:420px;width:100%"><div style="font-size:54px">⛔</div><h1 style="margin:10px 0 8px;font-size:24px">Acesso suspenso</h1>'
+    /* O bloqueio vale SÓ para a área de funcionários (tela de login e sistema aberto). O cardápio digital do cliente continua funcionando. */
+    function equipeAtiva(){
+      var l = document.getElementById('lockScreen'), m = document.getElementById('mainWrap');
+      return !!((l && !l.classList.contains('hidden')) || (m && m.classList.contains('unlocked')));
+    }
+    var fetchReal = window.fetch;
+    try{ window.fetch = function(){ if(equipeAtiva()) return Promise.reject(new Error('Acesso suspenso')); return fetchReal.apply(this, arguments); }; }catch(e){}
+    function conteudo(){
+      return '<div style="max-width:420px;width:100%"><div style="font-size:54px">⛔</div><h1 style="margin:10px 0 8px;font-size:24px">Acesso suspenso</h1>'
         + '<p style="color:#cfc4c4;margin:0 0 20px">' + esc(estado.msg || 'O acesso a este sistema está suspenso. Fale com o fornecedor do sistema.') + '</p>'
         + corpoPromessa()
-        + '<button onclick="location.reload()" style="font:inherit;padding:12px 22px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700">Verificar de novo</button></div></body>';
+        + '<button onclick="location.reload()" style="font:inherit;padding:12px 22px;border:0;border-radius:12px;background:#d4262c;color:#fff;font-weight:700">Verificar de novo</button></div>';
     }
-    repintar = function(){ pintar(); guardar(); };
-    function guardar(){
-      try{ var b = document.body; if(!b || b.__rvGuarda) return; b.__rvGuarda = true;
-        new MutationObserver(function(ms){ ms.forEach(function(m){ m.addedNodes.forEach(function(n){ if(n.parentNode === b && !n.__rv) b.removeChild(n); }); }); }).observe(b, { childList:true });
-        Array.prototype.forEach.call(b.children, function(n){ n.__rv = true; });
-      }catch(e){}
+    function pintar(forcar){
+      if(!document.body) return;
+      var d = document.getElementById('rvBloqueio');
+      if(!d){ d = document.createElement('div'); d.id = 'rvBloqueio'; d.style.cssText = 'position:fixed;inset:0;z-index:2147483647;display:none;align-items:center;justify-content:center;overflow:auto;background:#0a0a0a;color:#f3ecec;font:16px/1.5 system-ui,sans-serif;text-align:center;padding:24px;box-sizing:border-box'; document.body.appendChild(d); forcar = true; }
+      if(forcar){ d.innerHTML = conteudo(); }
+      d.style.display = equipeAtiva() ? 'flex' : 'none';
     }
-    window.addEventListener('unhandledrejection', function(e){ e.preventDefault(); }, true);
-    window.addEventListener('error', function(e){ e.stopImmediatePropagation(); }, true);
-    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ pintar(); guardar(); }); else { pintar(); guardar(); }
-    pintar(); guardar();
+    repintar = function(){ pintar(true); };
+    if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', function(){ pintar(true); }); else pintar(true);
+    setInterval(function(){ pintar(false); }, 400);
     // enquanto bloqueado, pergunta ao painel a cada minuto; liberou (ou promessa aprovada) = recarrega sozinho
     setInterval(function(){
       FETCH(PAINEL + '/rest/v1/rpc/status_restaurante', { method:'POST', headers:{ apikey:CHAVE, 'Content-Type':'application/json' }, body: JSON.stringify({ p_slug: R.slug || '', p_url: R.supabaseUrl || '' }) })
