@@ -44,6 +44,8 @@
       if(fila.length >= cfg.max) fila.shift();
       fila.push({ tipo:tipo, mensagem:msg, origem:origem, pilha:cortar(pilha, 600), tela:tela(), versao:cortar(window.APP_VERSAO || '', 30), aparelho:cortar(navigator.userAgent, 80), vezes:Math.min(vezes, 99) });
       agendar(cfg.primeiro);
+      /* v1.50: cópia para o Painel de Revenda (erros de todos os restaurantes num lugar só; sem dados de cliente) */
+      try{ if(window.rvRegistrarErro) window.rvRegistrarErro((tipo === 'aviso' ? 'Aviso de falha na tela: ' : '') + msg, origem + ' ' + cortar(pilha, 600)); }catch(e2){}
     }catch(e){}
   }
   async function enviar(){
@@ -2674,7 +2676,7 @@
   </div>
 </div>
 
-<script src="js/app-01-base-e-api.js?v=ea99e14f" charset="utf-8" data-origem="__big0__"></script>
+<script src="js/app-01-base-e-api.js?v=13ac347f" charset="utf-8" data-origem="__big0__"></script>
 <script src="js/app-02-abas.js?v=ab56e346" charset="utf-8" data-origem="__big1__"></script>
 <script src="js/app-03-cadastros.js?v=3c5db50a" charset="utf-8" data-origem="__big2__"></script>
 <script src="js/app-04-pedidos-entrega.js?v=fd320387" charset="utf-8" data-origem="__big3__"></script>

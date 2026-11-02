@@ -44,6 +44,8 @@
       if(fila.length >= cfg.max) fila.shift();
       fila.push({ tipo:tipo, mensagem:msg, origem:origem, pilha:cortar(pilha, 600), tela:tela(), versao:cortar(window.APP_VERSAO || '', 30), aparelho:cortar(navigator.userAgent, 80), vezes:Math.min(vezes, 99) });
       agendar(cfg.primeiro);
+      /* v1.50: cópia para o Painel de Revenda (erros de todos os restaurantes num lugar só; sem dados de cliente) */
+      try{ if(window.rvRegistrarErro) window.rvRegistrarErro((tipo === 'aviso' ? 'Aviso de falha na tela: ' : '') + msg, origem + ' ' + cortar(pilha, 600)); }catch(e2){}
     }catch(e){}
   }
   async function enviar(){
@@ -2674,7 +2676,7 @@
   </div>
 </div>
 
-<script src="js/app-01-base-e-api.js?v=365a9da4" charset="utf-8" data-origem="__big0__"></script>
+<script src="js/app-01-base-e-api.js?v=02b3825e" charset="utf-8" data-origem="__big0__"></script>
 <script src="js/app-02-abas.js?v=ab56e346" charset="utf-8" data-origem="__big1__"></script>
 <script src="js/app-03-cadastros.js?v=3c5db50a" charset="utf-8" data-origem="__big2__"></script>
 <script src="js/app-04-pedidos-entrega.js?v=fd320387" charset="utf-8" data-origem="__big3__"></script>
@@ -2682,13 +2684,13 @@
 <script src="js/app-06-caixa.js?v=1a2541c4" charset="utf-8" data-origem="__big5__"></script>
 <script src="js/app-07-impressao.js?v=3deae066" charset="utf-8" data-origem="__big6__"></script>
 <script src="js/app-08-vendas-despesas.js?v=0b8d9a34" charset="utf-8" data-origem="__big7__"></script>
-<script src="js/app-09-ajuda.js?v=d2d37958" charset="utf-8" data-origem="__big8__"></script>
+<script src="js/app-09-ajuda.js?v=c1dedf51" charset="utf-8" data-origem="__big8__"></script>
 <script src="js/app-10-backup-financeiro.js?v=f3d08c92" charset="utf-8" data-origem="__big9__"></script>
 <script src="js/app-11-admin-integracoes.js?v=5b194c22" charset="utf-8" data-origem="__big10__"></script>
 <script src="js/app-12-gestao-ia.js?v=9c37098f" charset="utf-8" data-origem="__big11__"></script>
 <script src="js/app-13-conexao-sync.js?v=b38413c9" charset="utf-8" data-origem="__big12__"></script>
 <script src="js/app-14-relatorios.js?v=89a1208a" charset="utf-8" data-origem="__big13__"></script>
-<script src="js/app-15-cardapio-cliente.js?v=3fda68f9" charset="utf-8" data-origem="__big14__"></script>
+<script src="js/app-15-cardapio-cliente.js?v=d6e0ddca" charset="utf-8" data-origem="__big14__"></script>
 <script src="js/app-16-sessao-final.js?v=54ce10c2" charset="utf-8" data-origem="__big15__"></script>
 <!-- ═══════════ SINCRONIZAÇÃO, BACKUP, ESPAÇO E INTEGRIDADE ═══════════
      app-17 cria cartões (ids sb410*) na tela Backup e espaço. -->
