@@ -210,6 +210,7 @@
   <div class="modal-box">
     <div class="modal-header"><h2>Lançamentos desde a abertura</h2><button class="close-btn" onclick="fecharLancamentos_()">✕</button></div>
     <div class="btnrow" style="margin:0 0 10px;">
+      <button class="ghost" style="padding:10px 14px;width:auto;" onclick="abrirModalSuprimento()">+ Suprimento</button>
       <button class="ghost" style="padding:10px 14px;width:auto;" onclick="abrirModalSangria()">− Sangria</button>
       <button class="small-gold" style="padding:10px 16px;width:auto;" onclick="abrirModalDespesa()">+ Despesa</button>
     </div>
@@ -228,6 +229,11 @@
       <div class="caixa-faixa aviso">Este caixa passou do vencimento. A diferença fica registrada como fechamento atrasado; a contagem completa pode ser feita depois.</div>
       <label for="fcMotivo">Motivo (opcional)</label>
       <input type="text" id="fcMotivo" maxlength="200" placeholder="Ex.: esqueci de fechar ontem">
+    </div>
+    <div id="fcMotivoDifBox" hidden>
+      <div class="caixa-faixa aviso">A diferença passou do limite definido pelo Administrador. Conte de novo; se estiver certa, explique o motivo. O Administrador recebe um aviso.</div>
+      <label for="fcMotivoDif">Motivo da diferença</label>
+      <input type="text" id="fcMotivoDif" maxlength="300" placeholder="Ex.: troco dado a mais na mesa 4">
     </div>
     <label for="fcSenha">Sua senha, para confirmar o fechamento</label>
     <input type="password" id="fcSenha" autocomplete="current-password">
@@ -1102,6 +1108,11 @@
 
     <div class="card" data-painel="sessoes">
       <h2>Histórico de sessões de caixa</h2>
+      <div class="modal-section">
+        <h3>Resumo do mês por operador</h3>
+        <div class="d-flex gap-2 mt-2"><input type="month" id="hcResumoMes" style="flex:1;" onchange="hcResumoOperadores_()"></div>
+        <div id="hcResumoOper" class="mt-2"></div>
+      </div>
       <table>
         <thead><tr><th>Abertura</th><th>Fechamento</th><th>Saldo</th><th>Dif.</th><th>Quem</th></tr></thead>
         <tbody id="hcTable"></tbody>
@@ -2630,8 +2641,55 @@
     <input type="number" id="sangValor" placeholder="0.00" step="0.01">
     <label for="sangMotivo">Motivo</label>
     <input type="text" id="sangMotivo" placeholder="Ex: retirada pro cofre, troco pro dono">
+    <label class="d-flex ai-centro gap-2" style="margin-top:8px;"><input type="checkbox" id="sangImprimir" style="width:auto;"> Imprimir comprovante (com assinaturas)</label>
     <button class="primary" onclick="salvarSangriaModal()">Registrar sangria</button>
     <div class="msg" id="sangMsg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="suprimentoModal">
+  <div class="modal-box">
+    <div class="modal-header"><h2>Suprimento de caixa</h2><button class="close-btn" onclick="fecharModalSuprimento()">✕</button></div>
+    <p class="sub">Dinheiro que ENTRA na gaveta durante o turno (ex.: reforço de troco). Soma no saldo esperado.</p>
+    <label for="supValor">Valor (R$)</label>
+    <input type="number" id="supValor" placeholder="0.00" step="0.01">
+    <label for="supMotivo">Motivo</label>
+    <input type="text" id="supMotivo" placeholder="Ex: reforço de troco">
+    <label class="d-flex ai-centro gap-2" style="margin-top:8px;"><input type="checkbox" id="supImprimir" style="width:auto;"> Imprimir comprovante (com assinaturas)</label>
+    <button class="primary" onclick="salvarSuprimentoModal()">Registrar suprimento</button>
+    <div class="msg" id="supMsg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="leituraXModal">
+  <div class="modal-box">
+    <div class="modal-header"><h2>Leitura X</h2><button class="close-btn" onclick="cxLeituraXFechar_()">✕</button></div>
+    <div class="relatorio-texto" id="leituraXTexto"></div>
+    <div class="btnrow">
+      <button class="primary mt-0" onclick="cxLeituraXCopiar_()">Copiar</button>
+      <button class="small-gold mt-0" onclick="cxLeituraXImprimir_()">Imprimir</button>
+    </div>
+    <div class="msg" id="leituraXMsg"></div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="passarCaixaModal">
+  <div class="modal-box">
+    <div class="modal-header"><h2>Passar o caixa</h2><button class="close-btn" onclick="cxPassarFechar_()">✕</button></div>
+    <p class="sub">Troca de turno: o caixa continua aberto e passa para outro operador. Conte a gaveta; a conferência fica registrada.</p>
+    <label for="passarPara">Quem vai receber o caixa</label>
+    <select id="passarPara"></select>
+    <label for="passarContado">Dinheiro contado na gaveta agora (R$)</label>
+    <input type="number" id="passarContado" inputmode="decimal" step="0.01" min="0" placeholder="0,00">
+    <div id="passarObsBox" hidden>
+      <div class="caixa-faixa aviso">A diferença passa do limite definido pelo Administrador. Explique o motivo.</div>
+      <label for="passarObs">Motivo da diferença</label>
+      <input type="text" id="passarObs" maxlength="300">
+    </div>
+    <label for="passarSenha">Sua senha, para confirmar</label>
+    <input type="password" id="passarSenha" autocomplete="current-password">
+    <button class="primary mt-3" onclick="cxPassarConfirmar_()">Passar o caixa</button>
+    <div class="msg" id="passarMsg"></div>
   </div>
 </div>
 
@@ -2640,6 +2698,7 @@
     <div class="modal-header"><h2>Abrir caixa</h2><button class="close-btn" onclick="fecharModalAbrirCaixa()">✕</button></div>
     <label for="fundoCaixaInput">Fundo de caixa (dinheiro para troco)</label>
     <input type="number" id="fundoCaixaInput" placeholder="0.00" step="0.01">
+    <div class="obs-line" id="fundoSugestao" style="margin:6px 0;"></div>
     <button class="primary" onclick="confirmarAbrirCaixa()">Abrir caixa</button>
     <div class="msg" id="abrirCaixaMsg"></div>
   </div>
@@ -2686,16 +2745,16 @@
   </div>
 </div>
 
-<script src="js/app-01-base-e-api.js?v=d615c737" charset="utf-8" data-origem="__big0__"></script>
+<script src="js/app-01-base-e-api.js?v=d652ca19" charset="utf-8" data-origem="__big0__"></script>
 <script src="js/app-02-abas.js?v=a1df3729" charset="utf-8" data-origem="__big1__"></script>
 <script src="js/app-03-cadastros.js?v=3c5db50a" charset="utf-8" data-origem="__big2__"></script>
 <script src="js/app-04-pedidos-entrega.js?v=91607d31" charset="utf-8" data-origem="__big3__"></script>
-<script src="js/app-05-avisos-push.js?v=fd835dcb" charset="utf-8" data-origem="__big4__"></script>
+<script src="js/app-05-avisos-push.js?v=82c85f97" charset="utf-8" data-origem="__big4__"></script>
 <script src="js/app-06-caixa.js?v=1a2541c4" charset="utf-8" data-origem="__big5__"></script>
-<script src="js/app-07-impressao.js?v=2cdc1837" charset="utf-8" data-origem="__big6__"></script>
-<script src="js/app-08-vendas-despesas.js?v=0b8d9a34" charset="utf-8" data-origem="__big7__"></script>
+<script src="js/app-07-impressao.js?v=866c0de6" charset="utf-8" data-origem="__big6__"></script>
+<script src="js/app-08-vendas-despesas.js?v=44a82f2b" charset="utf-8" data-origem="__big7__"></script>
 <script src="js/app-09-ajuda.js?v=9972bc3b" charset="utf-8" data-origem="__big8__"></script>
-<script src="js/app-10-backup-financeiro.js?v=f3d08c92" charset="utf-8" data-origem="__big9__"></script>
+<script src="js/app-10-backup-financeiro.js?v=5d8b2683" charset="utf-8" data-origem="__big9__"></script>
 <script src="js/app-11-admin-integracoes.js?v=ee862eca" charset="utf-8" data-origem="__big10__"></script>
 <script src="js/app-12-gestao-ia.js?v=9c37098f" charset="utf-8" data-origem="__big11__"></script>
 <script src="js/app-13-conexao-sync.js?v=f256a7af" charset="utf-8" data-origem="__big12__"></script>
