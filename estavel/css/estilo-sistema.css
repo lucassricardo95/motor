@@ -266,3 +266,8 @@ tr.sug-linha td{padding-top:0 !important;padding-bottom:10px;}
 .ap-logo{display:flex;gap:12px;align-items:center;margin:10px 0;}
 .ap-logo-img{width:84px;height:70px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);border-radius:10px;flex:0 0 auto;}
 .ap-logo-img img{max-width:100%;max-height:100%;object-fit:contain;}
+
+/* v1.30: texto comprido sem espaço (e-mail, link, observação de uma conta) quebra a linha em vez de alargar a tela para o lado */
+.notif-card, .notif-card .obs-line, .card .obs-line, .card .sub{overflow-wrap:anywhere;min-width:0;}
+.tab{max-width:100%;}
+html, body{overflow-x:clip;}

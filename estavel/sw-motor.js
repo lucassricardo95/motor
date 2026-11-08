@@ -17,7 +17,7 @@ const CODIGO = 'codigo-v1';   // trocou o nome = todo aparelho descarta o cache 
 const LISTA = [/*LISTA-INICIO*/
   'js/app-00-marca.js?v=319b9568',
   'css/estilo-base.css?v=9af376ca',
-  'js/app-01-base-e-api.js?v=dbdc16d5',
+  'js/app-01-base-e-api.js?v=763f579a',
   'js/app-02-abas.js?v=a1df3729',
   'js/app-03-cadastros.js?v=3c5db50a',
   'js/app-04-pedidos-entrega.js?v=91607d31',
@@ -82,7 +82,7 @@ const LISTA = [/*LISTA-INICIO*/
   'js/app-58-drive-direto.js?v=9e4d8a06',
   'js/app-48-armazenamento.js?v=c4160c65',
   'js/app-32-equipe.js?v=15e8d37a',
-  'css/estilo-sistema.css?v=b021fb32',
+  'css/estilo-sistema.css?v=f40a164e',
   'js/app-59-layout.js?v=5aa543db',
   'js/app-61-custos-gerais.js?v=856d2e6d',
   'js/app-62-raio-x.js?v=a9a70e0e',
