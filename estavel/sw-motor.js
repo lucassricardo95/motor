@@ -17,7 +17,7 @@ const CODIGO = 'codigo-v1';   // trocou o nome = todo aparelho descarta o cache 
 const LISTA = [/*LISTA-INICIO*/
   'js/app-00-marca.js?v=5f4ae54b',
   'css/estilo-base.css?v=9af376ca',
-  'js/app-01-base-e-api.js?v=ba910f15',
+  'js/app-01-base-e-api.js?v=e10fd547',
   'js/app-02-abas.js?v=a1df3729',
   'js/app-03-cadastros.js?v=3c5db50a',
   'js/app-04-pedidos-entrega.js?v=471f6728',
