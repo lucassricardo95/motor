@@ -271,3 +271,11 @@ tr.sug-linha td{padding-top:0 !important;padding-bottom:10px;}
 .notif-card, .notif-card .obs-line, .card .obs-line, .card .sub{overflow-wrap:anywhere;min-width:0;}
 .tab{max-width:100%;}
 html, body{overflow-x:clip;}
+
+/* v1.31: tela Comanda — escolhas de tamanho lado a lado; no PC, ajustes à esquerda e a prévia fixa à direita */
+#cmCorpo .vs-escolha{flex-direction:row;flex-wrap:wrap}
+#cmCorpo .vs-escolha .vs-op{flex:1 1 120px;width:auto;text-align:center}
+@media(min-width:1024px){
+  #cmCorpo .cm-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:28px;align-items:start}
+  #cmCorpo .cm-prev{position:sticky;top:96px}
+}

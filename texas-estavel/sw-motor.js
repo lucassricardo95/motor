@@ -17,7 +17,7 @@ const CODIGO = 'texas-codigo-v6';   // trocou o nome = todo aparelho descarta o 
 const LISTA = [/*LISTA-INICIO*/
   'js/app-00-marca.js?v=5f4ae54b',
   'js/app-65-aparencia.js?v=89513a77',
-  'js/app-66-comanda.js?v=b499c36b',
+  'js/app-66-comanda.js?v=0e8725ab',
   'css/estilo-base.css?v=9af376ca',
   'js/app-01-base-e-api.js?v=11210dd5',
   'js/app-02-abas.js?v=a1df3729',
@@ -84,7 +84,7 @@ const LISTA = [/*LISTA-INICIO*/
   'js/app-58-drive-direto.js?v=9e4d8a06',
   'js/app-48-armazenamento.js?v=c4160c65',
   'js/app-32-equipe.js?v=15e8d37a',
-  'css/estilo-sistema.css?v=f40a164e',
+  'css/estilo-sistema.css?v=796b503b',
   'js/app-59-layout.js?v=5aa543db',
   'js/app-61-custos-gerais.js?v=856d2e6d',
   'js/app-62-raio-x.js?v=a9a70e0e',
