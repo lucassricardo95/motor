@@ -6,7 +6,7 @@
 <!-- SEGURANÇA: mesmo que algum texto malicioso escapasse, a página só consegue falar com o Google Apps Script (planilha e contingência). -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://sdk.mercadopago.com https://*.mercadopago.com https://*.mercadopago.com.br https://*.mercadolibre.com https://*.mlstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.mercadopago.com https://*.mlstatic.com; font-src https://fonts.gstatic.com https://*.mlstatic.com; img-src 'self' https: data: blob:; connect-src 'self' https://*.mercadopago.com https://*.mercadopago.com.br https://*.mercadolibre.com https://*.mlstatic.com https://nominatim.openstreetmap.org https://router.project-osrm.org https://viacep.com.br https://script.google.com https://script.googleusercontent.com https://*.supabase.co wss://*.supabase.co; frame-src https://*.mercadopago.com https://*.mercadopago.com.br https://*.mercadolibre.com https://*.mlstatic.com; manifest-src 'self' blob:; worker-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none';">
 <script src="config-restaurante.js"></script>
-<script src="js/app-00-marca.js?v=87e555f3"></script>
+<script src="js/app-00-marca.js?v=5e217ae8"></script>
 <!-- Aparelho da equipe com sessão salva: mostra só o fundo e a logo até o sistema abrir (o cardápio público não "pisca" antes do login). Cliente sem login: nada muda. -->
 <style id="txbSplashCss">html.txb-equipe::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;background:#14100c url(img/logo.png) center center/min(52vw,210px) auto no-repeat;}</style>
 <script id="txbSplash">(function(){var h=document.documentElement;window.txbSplashFim_=function(){try{h.classList.remove('txb-equipe');}catch(e){}};try{if(localStorage.getItem('texasBurgerSessao_v2')){h.classList.add('txb-equipe');setTimeout(window.txbSplashFim_,8000);}}catch(e){}})();</script>
@@ -2745,17 +2745,17 @@
   </div>
 </div>
 
-<script src="js/app-01-base-e-api.js?v=3c499863" charset="utf-8" data-origem="__big0__"></script>
-<script src="js/app-02-abas.js?v=a1df3729" charset="utf-8" data-origem="__big1__"></script>
+<script src="js/app-01-base-e-api.js?v=f955cc24" charset="utf-8" data-origem="__big0__"></script>
+<script src="js/app-02-abas.js?v=8f193b03" charset="utf-8" data-origem="__big1__"></script>
 <script src="js/app-03-cadastros.js?v=c8a03ce3" charset="utf-8" data-origem="__big2__"></script>
-<script src="js/app-04-pedidos-entrega.js?v=471f6728" charset="utf-8" data-origem="__big3__"></script>
-<script src="js/app-05-avisos-push.js?v=82c85f97" charset="utf-8" data-origem="__big4__"></script>
+<script src="js/app-04-pedidos-entrega.js?v=1e5a4270" charset="utf-8" data-origem="__big3__"></script>
+<script src="js/app-05-avisos-push.js?v=ef40d7d4" charset="utf-8" data-origem="__big4__"></script>
 <script src="js/app-06-caixa.js?v=1a2541c4" charset="utf-8" data-origem="__big5__"></script>
 <script src="js/app-07-impressao.js?v=41b09c75" charset="utf-8" data-origem="__big6__"></script>
 <script src="js/app-08-vendas-despesas.js?v=44a82f2b" charset="utf-8" data-origem="__big7__"></script>
 <script src="js/app-09-ajuda.js?v=1277a9c5" charset="utf-8" data-origem="__big8__"></script>
-<script src="js/app-10-backup-financeiro.js?v=5d8b2683" charset="utf-8" data-origem="__big9__"></script>
-<script src="js/app-11-admin-integracoes.js?v=4d8a34da" charset="utf-8" data-origem="__big10__"></script>
+<script src="js/app-10-backup-financeiro.js?v=2969f00f" charset="utf-8" data-origem="__big9__"></script>
+<script src="js/app-11-admin-integracoes.js?v=dc860da8" charset="utf-8" data-origem="__big10__"></script>
 <script src="js/app-12-gestao-ia.js?v=9c37098f" charset="utf-8" data-origem="__big11__"></script>
 <script src="js/app-13-conexao-sync.js?v=f256a7af" charset="utf-8" data-origem="__big12__"></script>
 <script src="js/app-14-relatorios.js?v=89a1208a" charset="utf-8" data-origem="__big13__"></script>
@@ -2764,7 +2764,7 @@
 <!-- ═══════════ SINCRONIZAÇÃO, BACKUP, ESPAÇO E INTEGRIDADE ═══════════
      app-17 cria cartões (ids sb410*) na tela Backup e espaço. -->
 
-<script src="js/app-17-sessao-supabase.js?v=5a30d71b" charset="utf-8" data-origem=""></script>
+<script src="js/app-17-sessao-supabase.js?v=8e64bf9f" charset="utf-8" data-origem=""></script>
 
 <!-- ═══════════ MODO RESERVA (queda do Supabase) ═══════════
      Detecta a queda do Supabase, avisa com faixa laranja e reenvia a fila do aparelho sozinha na volta.
@@ -2781,12 +2781,12 @@
 ===================================================================== -->
 <link rel="stylesheet" href="css/estilo-ia-cardapio.css?v=ffe00c8f">
 
-<script src="js/app-19-ia.js?v=2b5d779e" charset="utf-8" data-origem="iaModulo"></script>
+<script src="js/app-19-ia.js?v=4e011af4" charset="utf-8" data-origem="iaModulo"></script>
 <!-- =====================================================================
    BALÃO ÚNICO — parte da EQUIPE (Fase 3/4): só texto. O roteador do ai-gateway escolhe o robô; a fila de clientes aparece como aviso.
    Reaproveita IA.chamar, sbRpc_, sbSessaoLer_, sbJson_. Nenhum botão de função: tudo é texto (exceto Assumir/Encerrar/Sair da conversa).
    ===================================================================== -->
-<script src="js/app-20-balao-interno.js?v=9e6ef095" charset="utf-8" data-origem="balaoInterno"></script>
+<script src="js/app-20-balao-interno.js?v=e2f19126" charset="utf-8" data-origem="balaoInterno"></script>
 
 <!-- =====================================================================
    FASE 5 — Localização do entregador (plano V3 §49–§59). Aditivo.
@@ -2810,7 +2810,7 @@
 <link rel="stylesheet" href="css/estilo-conta-pagamento.css?v=d22e4d74">
 <link rel="stylesheet" href="css/estilo-sistema.css?v=b4512556">
 <script src="js/app-28-dialogos.js?v=5e2e43b5" charset="utf-8" data-origem=""></script>
-<script src="js/app-27-conta-cliente.js?v=468f1a71" charset="utf-8" data-origem=""></script>
+<script src="js/app-27-conta-cliente.js?v=e8c26e63" charset="utf-8" data-origem=""></script>
 <script src="js/app-29-usabilidade.js?v=6604f784" charset="utf-8" data-origem=""></script>
 <script src="js/app-30-teclado-pc.js?v=b3d6968e" charset="utf-8" data-origem=""></script>
 <script src="js/app-31-alertas.js?v=7455ae8a" charset="utf-8" data-origem=""></script>
@@ -2820,15 +2820,15 @@
 <script src="js/app-35-equipe-extras.js?v=c60dad50" charset="utf-8" data-origem=""></script>
 <script src="js/app-36-gestao.js?v=bc402363" charset="utf-8" data-origem=""></script>
 <script src="js/app-37-ponto-rapido.js?v=78c0fc6d" charset="utf-8" data-origem=""></script>
-<script src="js/app-38-ponto-rosto.js?v=843ff624" charset="utf-8" data-origem=""></script>
-<script src="js/app-39-fotos-registros.js?v=7786e7f0" charset="utf-8" data-origem=""></script>
-<script src="js/app-40-etiquetas.js?v=5ac4487f" charset="utf-8" data-origem=""></script>
+<script src="js/app-38-ponto-rosto.js?v=a211eaa2" charset="utf-8" data-origem=""></script>
+<script src="js/app-39-fotos-registros.js?v=c7ca4b93" charset="utf-8" data-origem=""></script>
+<script src="js/app-40-etiquetas.js?v=63008ea7" charset="utf-8" data-origem=""></script>
 <script src="js/app-41-ifood-extras.js?v=0627cb38" charset="utf-8" data-origem=""></script>
 <script src="js/app-42-ifood-catalogo.js?v=60701d5d" charset="utf-8" data-origem=""></script>
 <script src="js/app-43-erros-visiveis.js?v=6051fe22" charset="utf-8" data-origem=""></script>
 <script src="js/app-44-ifood-vinheta.js?v=8b7ccdc6" charset="utf-8" data-origem=""></script>
 <script src="js/app-45-ver-cardapio.js?v=a75737b8" charset="utf-8" data-origem=""></script>
-<script src="js/app-46-cardapio-hoje.js?v=bca844d0" charset="utf-8" data-origem=""></script>
+<script src="js/app-46-cardapio-hoje.js?v=8756acdc" charset="utf-8" data-origem=""></script>
 <script src="js/app-47-cardapio-facil.js?v=27ecb254" charset="utf-8" data-origem=""></script>
 <script src="js/app-51-infinitepay.js?v=af7923ee" charset="utf-8" data-origem=""></script>
 <script src="js/app-52-ifood-financeiro.js?v=bf3223c9" charset="utf-8" data-origem=""></script>
@@ -2840,7 +2840,7 @@
 <script src="js/app-50-ifood-homologacao.js?v=da02f0c7" charset="utf-8" data-origem=""></script>
 <script src="js/app-49-jogos.js?v=17d306d2" charset="utf-8" data-origem=""></script>
 <script src="js/app-58-drive-direto.js?v=9e4d8a06" charset="utf-8" data-origem=""></script>
-<script src="js/app-48-armazenamento.js?v=c4160c65" charset="utf-8" data-origem=""></script>
+<script src="js/app-48-armazenamento.js?v=e7cb0b0a" charset="utf-8" data-origem=""></script>
 <script src="js/app-59-layout.js?v=5aa543db" charset="utf-8" data-origem=""></script>
 <script src="js/app-61-custos-gerais.js?v=856d2e6d" charset="utf-8" data-origem=""></script>
 <script src="js/app-62-raio-x.js?v=a9a70e0e" charset="utf-8" data-origem=""></script>
