@@ -1,4 +1,4 @@
-/* (c) Lucas S. Ricardo - todos os direitos reservados. Software proprietario licenciado por restaurante; copia, redistribuicao ou engenharia reversa sao proibidas (Lei 9.609/98 e 9.610/98). Build texas-v1.63-605654d1d0 */
+/* (c) Lucas S. Ricardo - todos os direitos reservados. Software proprietario licenciado por restaurante; copia, redistribuicao ou engenharia reversa sao proibidas (Lei 9.609/98 e 9.610/98). Build v1.63-31ab8c4aa1 */
 function renderMesas(){const o=document.getElementById("mesaTable");if(!o)return;if(!mesas.length){o.innerHTML='<tr class="empty-row"><td colspan="3">Nenhuma mesa cadastrada ainda.</td></tr>';return}const e=["Livre","Ocupada","Aguardando fechamento","Fechada","Bloqueada/Manutenção"];o.innerHTML=mesas.map(a=>`<tr>
     <td>Mesa ${a.numero}${a.capacidade?' <span class="obs-line">('+a.capacidade+" lugares)</span>":""}</td>
     <td><select onchange="mudarStatusMesa('${a.id}', this.value)">${e.map(s=>`<option value="${s}" ${s===a.status?"selected":""}>${s}</option>`).join("")}</select></td>
