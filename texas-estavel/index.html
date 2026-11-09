@@ -8,7 +8,9 @@
 <script src="config-restaurante.js"></script>
 <script src="js/app-00-marca.js?v=040f6f27"></script>
 <!-- Aparelho da equipe com sessão salva: mostra só o fundo e a logo até o sistema abrir (o cardápio público não "pisca" antes do login). Cliente sem login: nada muda. -->
-<style id="txbSplashCss">html.txb-equipe::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;background:#0b0705 url(img/logo-texas-burger.webp) center center/min(52vw,210px) auto no-repeat;}</style>
+<style id="txbSplashCss">html.txb-equipe::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;background:#0b0705 url(img/logo-texas-burger.webp) center center/min(52vw,210px) auto no-repeat;}
+.nao-dev #bkAvancado{display:none!important}
+</style>
 <script id="txbSplash">(function(){var h=document.documentElement;window.txbSplashFim_=function(){try{h.classList.remove('txb-equipe');}catch(e){}};try{if(localStorage.getItem('texasBurgerSessao_v2')){h.classList.add('txb-equipe');setTimeout(window.txbSplashFim_,8000);}}catch(e){}})();</script>
 <!-- =====================================================================
  TEXAS BURGER — captura de ERROS DE JAVASCRIPT (para o diagnóstico do Desenvolvedor)
@@ -2747,7 +2749,7 @@
 </div>
 
 <script src="js/app-01-base-e-api.js?v=427c6daa" charset="utf-8" data-origem="__big0__"></script>
-<script src="js/app-02-abas.js?v=8f193b03" charset="utf-8" data-origem="__big1__"></script>
+<script src="js/app-02-abas.js?v=fde007fc" charset="utf-8" data-origem="__big1__"></script>
 <script src="js/app-03-cadastros.js?v=c8a03ce3" charset="utf-8" data-origem="__big2__"></script>
 <script src="js/app-04-pedidos-entrega.js?v=ee26fc99" charset="utf-8" data-origem="__big3__"></script>
 <script src="js/app-05-avisos-push.js?v=500dd772" charset="utf-8" data-origem="__big4__"></script>
@@ -2756,7 +2758,7 @@
 <script src="js/app-08-vendas-despesas.js?v=44a82f2b" charset="utf-8" data-origem="__big7__"></script>
 <script src="js/app-09-ajuda.js?v=1b108365" charset="utf-8" data-origem="__big8__"></script>
 <script src="js/app-10-backup-financeiro.js?v=2969f00f" charset="utf-8" data-origem="__big9__"></script>
-<script src="js/app-11-admin-integracoes.js?v=dc860da8" charset="utf-8" data-origem="__big10__"></script>
+<script src="js/app-11-admin-integracoes.js?v=ede55802" charset="utf-8" data-origem="__big10__"></script>
 <script src="js/app-12-gestao-ia.js?v=9c37098f" charset="utf-8" data-origem="__big11__"></script>
 <script src="js/app-13-conexao-sync.js?v=c5153ada" charset="utf-8" data-origem="__big12__"></script>
 <script src="js/app-14-relatorios.js?v=89a1208a" charset="utf-8" data-origem="__big13__"></script>
@@ -2831,7 +2833,7 @@
 <script src="js/app-45-ver-cardapio.js?v=a75737b8" charset="utf-8" data-origem=""></script>
 <script src="js/app-46-cardapio-hoje.js?v=8756acdc" charset="utf-8" data-origem=""></script>
 <script src="js/app-47-cardapio-facil.js?v=27ecb254" charset="utf-8" data-origem=""></script>
-<script src="js/app-51-infinitepay.js?v=a3fdd917" charset="utf-8" data-origem=""></script>
+<script src="js/app-51-infinitepay.js?v=b902ba8b" charset="utf-8" data-origem=""></script>
 <script src="js/app-52-ifood-financeiro.js?v=bf3223c9" charset="utf-8" data-origem=""></script>
 <script src="js/app-53-ifood-entregador.js?v=b0e6ddfa" charset="utf-8" data-origem=""></script>
 <script src="js/app-54-ifood-indicadores.js?v=144d8d09" charset="utf-8" data-origem=""></script>
