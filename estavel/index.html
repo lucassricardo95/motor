@@ -10,6 +10,7 @@
 <!-- Aparelho da equipe com sessão salva: mostra só o fundo e a logo até o sistema abrir (o cardápio público não "pisca" antes do login). Cliente sem login: nada muda. -->
 <style id="txbSplashCss">html.txb-equipe::before{content:"";position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483000;background:#14100c url(img/logo.png) center center/min(52vw,210px) auto no-repeat;}
 .nao-dev #bkAvancado{display:none!important}
+.nao-dev #sb410BkMaisBtn,.nao-dev #sb410BkMais,.nao-dev #bkCopias .bk-btns,.nao-dev #driveDiretoLista details,.nao-dev #fotosSemUsoBox,.nao-dev #drivePrazosCard{display:none!important}   /* configurar/restaurar/excluir backup, sincronizar planilha, opções do Drive e prazos: só o Desenvolvedor, pelo painel */
 </style>
 <script id="txbSplash">(function(){var h=document.documentElement;window.txbSplashFim_=function(){try{h.classList.remove('txb-equipe');}catch(e){}};try{if(localStorage.getItem('texasBurgerSessao_v2')){h.classList.add('txb-equipe');setTimeout(window.txbSplashFim_,8000);}}catch(e){}})();</script>
 <!-- =====================================================================
