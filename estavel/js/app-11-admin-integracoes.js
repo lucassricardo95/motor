@@ -1,4 +1,4 @@
-/* (c) Lucas S. Ricardo - todos os direitos reservados. Software proprietario licenciado por restaurante; copia, redistribuicao ou engenharia reversa sao proibidas (Lei 9.609/98 e 9.610/98). Build v1.86-06509898f4 */
+/* (c) Lucas S. Ricardo - todos os direitos reservados. Software proprietario licenciado por restaurante; copia, redistribuicao ou engenharia reversa sao proibidas (Lei 9.609/98 e 9.610/98). Build v1.87-c096f4eb9c */
 function renderMesas(){const o=document.getElementById("mesaTable");if(!o)return;if(!mesas.length){o.innerHTML='<tr class="empty-row"><td colspan="3">Nenhuma mesa cadastrada ainda.</td></tr>';return}const e=["Livre","Ocupada","Aguardando fechamento","Fechada","Bloqueada/Manutenção"];o.innerHTML=mesas.map(a=>`<tr>
     <td>Mesa ${a.numero}${a.capacidade?' <span class="obs-line">('+a.capacidade+" lugares)</span>":""}</td>
     <td><select onchange="mudarStatusMesa('${a.id}', this.value)">${e.map(s=>`<option value="${s}" ${s===a.status?"selected":""}>${s}</option>`).join("")}</select></td>
@@ -36,7 +36,7 @@ function renderMesas(){const o=document.getElementById("mesaTable");if(!o)return
     ${i("📖 Como fazer",`<details id="integGuia_${o.provedor}" class="ig-guia"><summary>Abrir o passo a passo</summary>${e.guia.map(g=>`<div class="obs-line">${escH(g)}</div>`).join("")}</details>`,"",!0)}
     ${i("🔑 Chaves e códigos",n,"Digite só aqui, nunca por mensagem. Pede a sua senha de administrador.",!0)}
     ${i("✅ Lista de conferência",t,"",!0)}
-    ${d?i("🧾 Cadastro fiscal",fiscalExtraHtml_(o,"setup"),"O contador define; você cadastra aqui antes de ligar.",!0):""}
+    ${d?i("🧾 Cadastro fiscal",fiscalExtraHtml_(o,"setup"),"Produtos e combos que ainda precisam de perfil fiscal (o cadastro fiscal é feito pelo desenvolvedor)."):""}
     ${d?i("⚙️ Onde e quando emitir",nfceOpcoesHtml_(o)):""}
     ${c?i("⚙️ Ajustes",r):""}
     ${c?i("🧩 Tipo de aplicativo do iFood",ifAppHtml_(),"Próprio: os códigos do aplicativo que você já usa hoje. Compartilhado: um aplicativo único do sistema, que o dono do restaurante autoriza."):""}
@@ -104,11 +104,11 @@ A partir daqui o sistema passa a usar essa integração. Dá para desligar a qua
       <button class="ghost" onclick="carregarNfcePacote_()">Pacote do contador</button>
     </div><div id="nfceLista"></div><div id="nfceConf"></div><div id="nfcePac"></div></div>`:`<div>
     <div class="btnrow">
-      <button class="ghost" onclick="carregarFiscalEmpresa_()">Dados fiscais da empresa</button>
-      <button class="ghost" onclick="carregarFiscalPerfis_()">Perfis fiscais</button>
+      <button class="ghost" data-dev="1" onclick="carregarFiscalEmpresa_()">Dados fiscais da empresa</button>
+      <button class="ghost" data-dev="1" onclick="carregarFiscalPerfis_()">Perfis fiscais</button>
       <button class="ghost" onclick="carregarFiscalSem_()">Itens sem perfil</button>
-      <button class="ghost" onclick="baixarPlanilhaFiscal_()">Baixar planilha do contador</button>
-      <button class="ghost" onclick="document.getElementById('fiscalArq').click()">Enviar planilha preenchida</button>
+      <button class="ghost" data-dev="1" onclick="baixarPlanilhaFiscal_()">Baixar planilha do contador</button>
+      <button class="ghost" data-dev="1" onclick="document.getElementById('fiscalArq').click()">Enviar planilha preenchida</button>
       <input type="file" id="fiscalArq" accept=".csv,text/csv,text/plain" style="display:none;" onchange="enviarPlanilhaFiscal_(this)">
     </div>
     <div id="fiscalEmpresa"></div><div id="fiscalPerfis"></div><div id="fiscalSem"></div></div>`}const FISCAL_CAMPOS_=[["razaoSocial","razao_social","Razão social"],["nomeFantasia","nome_fantasia","Nome fantasia"],["cnpj","cnpj","CNPJ (só números)"],["inscricaoEstadual","inscricao_estadual","Inscrição estadual"],["cep","cep","CEP"],["logradouro","logradouro","Rua / avenida"],["numero","numero","Número"],["complemento","complemento","Complemento"],["bairro","bairro","Bairro"],["municipio","municipio","Cidade"],["codigoMunicipio","codigo_municipio","Código do município (7 números — o contador informa)"],["uf","uf","Estado (ex.: SP)"],["telefone","telefone","Telefone"],["cscId","csc_id","Número do CSC (identificador, não o código secreto)"],["serie","serie","Série das notas (normalmente 1)"],["aliquotaSimples","aliquota_simples","Alíquota padrão do imposto em % (vale para os meses sem alíquota própria em Dinheiro → Relatórios e DRE, cartão DRE; só para estimar o imposto no resultado e nas margens)"]];async function carregarFiscalEmpresa_(){const o=document.getElementById("fiscalEmpresa");if(o)try{const e=await apiCall("fiscalEmpresaLer",{});if(!e||!e.ok){o.innerHTML='<div class="obs-line">'+escH(e&&e.message||"Não foi possível carregar.")+"</div>";return}const a=e.empresa||{};o.innerHTML=`<div class="notif-card"><b>Dados fiscais da empresa</b> ${e.completa?"✅ completos":"⬜ incompletos"}${e.temCsc?"":" · falta digitar o CSC secreto (cartão Chaves, acima)"}
