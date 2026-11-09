@@ -15,7 +15,7 @@ const FOTOS = 'texas-fotos-v1';
    A lista abaixo é gerada pelo script de selagem (selar.py) a cada entrega. */
 const CODIGO = 'texas-codigo-v6';   // trocou o nome = todo aparelho descarta o cache de código antigo (inclusive cópia vazia)
 const LISTA = [/*LISTA-INICIO*/
-  'js/app-00-marca.js?v=5e217ae8',
+  'js/app-00-marca.js?v=72dec2ab',
   'js/app-65-aparencia.js?v=89513a77',
   'js/app-66-comanda.js?v=0e8725ab',
   'css/estilo-base.css?v=9af376ca',
@@ -63,7 +63,7 @@ const LISTA = [/*LISTA-INICIO*/
   'js/app-40-etiquetas.js?v=63008ea7',
   'js/app-41-ifood-extras.js?v=0627cb38',
   'js/app-42-ifood-catalogo.js?v=60701d5d',
-  'js/app-43-erros-visiveis.js?v=6051fe22',
+  'js/app-43-erros-visiveis.js?v=edfd570c',
   'js/app-44-ifood-vinheta.js?v=8b7ccdc6',
   'js/app-45-ver-cardapio.js?v=a75737b8',
   'js/app-46-cardapio-hoje.js?v=8756acdc',
